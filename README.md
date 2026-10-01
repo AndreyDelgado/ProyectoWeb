@@ -2,6 +2,22 @@
 
 
 
+## Base de datos
+
+La solución utiliza SQL Server y Entity Framework Core. En desarrollo, la API crea `MantenimientoActivosDb` en `(localdb)\MSSQLLocalDB` y carga los datos iniciales al arrancar.
+
+Para inicializarla desde la API, ejecuta desde `Proyecto.WebAPI`:
+
+```powershell
+dotnet run
+```
+
+Para crearla manualmente, ejecuta `database/MantenimientoActivos.sql` en SQL Server Management Studio o con `sqlcmd -f 65001 -i .\database\MantenimientoActivos.sql`. El script crea las tablas, relaciones, restricciones e inserts de ejemplo; puede ejecutarse nuevamente sin duplicar esos datos.
+
+El modelo inicial incluye categorías, ubicaciones, proveedores, activos, tipos de mantenimiento y órdenes de mantenimiento. La cadena de conexión de desarrollo está en `Proyecto.WebAPI/appsettings.Development.json` y se puede reemplazar por la instancia SQL Server del equipo.
+
+
+
 ## Getting started
 
 To make it easy for you to get started with GitLab, here's a list of recommended next steps.
