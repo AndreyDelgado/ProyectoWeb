@@ -18,7 +18,7 @@ if (app.Environment.IsDevelopment())
 {
     await using var scope = app.Services.CreateAsyncScope();
     var database = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await database.Database.EnsureCreatedAsync();
+    await database.Database.MigrateAsync();
 }
 
 // Configure the HTTP request pipeline.
