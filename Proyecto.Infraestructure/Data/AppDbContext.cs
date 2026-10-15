@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Proyecto.Domain.Entities;
+using Proyecto.Infraestructure.Data.Seed;
 
 namespace Proyecto.Infraestructure.Data;
 
@@ -23,10 +24,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.Property(category => category.IsActive).HasDefaultValue(true);
             entity.HasIndex(category => category.Name).IsUnique();
         });
-        modelBuilder.Entity<AssetCategory>().HasData(
-            new AssetCategory { Id = 1, Name = "Equipo de cómputo", Description = "Computadoras y periféricos" },
-            new AssetCategory { Id = 2, Name = "Mobiliario", Description = "Muebles y estaciones de trabajo" },
-            new AssetCategory { Id = 3, Name = "Equipo industrial", Description = "Máquinas y herramientas de producción" });
 
         modelBuilder.Entity<Location>(entity =>
         {
@@ -37,10 +34,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.Property(location => location.IsActive).HasDefaultValue(true);
             entity.HasIndex(location => location.Name).IsUnique();
         });
-        modelBuilder.Entity<Location>().HasData(
-            new Location { Id = 1, Name = "Edificio principal", Description = "Sede central" },
-            new Location { Id = 2, Name = "Taller", Description = "Área de mantenimiento" },
-            new Location { Id = 3, Name = "Bodega", Description = "Almacenamiento de activos" });
 
         modelBuilder.Entity<Supplier>(entity =>
         {
@@ -55,9 +48,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.Property(supplier => supplier.IsActive).HasDefaultValue(true);
             entity.HasIndex(supplier => supplier.TaxId).IsUnique();
         });
-        modelBuilder.Entity<Supplier>().HasData(
-            new Supplier { Id = 1, Name = "Servicios Técnicos CR", TaxId = "3-101-000001", ContactName = "María Rodríguez", Phone = "2200-1000", Email = "servicio@example.com", Address = "San José" },
-            new Supplier { Id = 2, Name = "Mantenimiento Industrial del Valle", TaxId = "3-101-000002", ContactName = "Carlos Méndez", Phone = "2200-2000", Email = "taller@example.com", Address = "Heredia" });
 
         modelBuilder.Entity<Asset>(entity =>
         {
@@ -86,10 +76,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.HasOne(asset => asset.Supplier).WithMany(supplier => supplier.Assets)
                 .HasForeignKey(asset => asset.SupplierId).OnDelete(DeleteBehavior.Restrict);
         });
-        modelBuilder.Entity<Asset>().HasData(
-            new Asset { Id = 1, AssetCode = "ACT-0001", Name = "Laptop de administración", Description = "Equipo portátil de oficina", Brand = "Dell", Model = "Latitude 5440", SerialNumber = "SN-DELL-0001", AcquiredOn = new DateTime(2024, 1, 15), PurchaseCost = 625000m, UsefulLifeMonths = 48, CategoryId = 1, LocationId = 1, SupplierId = 1, CreatedAt = new DateTime(2024, 1, 15, 0, 0, 0, DateTimeKind.Utc) },
-            new Asset { Id = 2, AssetCode = "ACT-0002", Name = "Taladro de banco", Description = "Taladro para trabajos de taller", Brand = "Bosch", Model = "GBM 13-2 RE", SerialNumber = "SN-BOSCH-0002", AcquiredOn = new DateTime(2023, 8, 10), PurchaseCost = 185000m, UsefulLifeMonths = 72, CategoryId = 3, LocationId = 2, SupplierId = 2, CreatedAt = new DateTime(2023, 8, 10, 0, 0, 0, DateTimeKind.Utc) },
-            new Asset { Id = 3, AssetCode = "ACT-0003", Name = "Escritorio de recepción", Description = "Módulo de recepción", Brand = "Oficina CR", Model = "Recepción 180", AcquiredOn = new DateTime(2022, 3, 2), PurchaseCost = 210000m, UsefulLifeMonths = 120, CategoryId = 2, LocationId = 1, CreatedAt = new DateTime(2022, 3, 2, 0, 0, 0, DateTimeKind.Utc) });
 
         modelBuilder.Entity<MaintenanceType>(entity =>
         {
@@ -100,10 +86,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.Property(type => type.Description).HasMaxLength(250);
             entity.HasIndex(type => type.Name).IsUnique();
         });
-        modelBuilder.Entity<MaintenanceType>().HasData(
-            new MaintenanceType { Id = 1, Name = "Preventivo", Description = "Mantenimiento programado para prevenir fallas", DefaultIntervalDays = 90 },
-            new MaintenanceType { Id = 2, Name = "Correctivo", Description = "Reparación de una falla reportada" },
-            new MaintenanceType { Id = 3, Name = "Inspección", Description = "Revisión general del estado del activo", DefaultIntervalDays = 180 });
 
         modelBuilder.Entity<MaintenanceOrder>(entity =>
         {
@@ -131,9 +113,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.HasOne(order => order.Supplier).WithMany(supplier => supplier.MaintenanceOrders)
                 .HasForeignKey(order => order.SupplierId).OnDelete(DeleteBehavior.Restrict);
         });
-        modelBuilder.Entity<MaintenanceOrder>().HasData(
-            new MaintenanceOrder { Id = 1, WorkOrderCode = "OT-2026-0001", AssetId = 1, MaintenanceTypeId = 1, SupplierId = 1, Title = "Limpieza y revisión preventiva", Description = "Limpieza interna, revisión de batería y diagnóstico", Priority = "Medium", Status = "Planned", ScheduledFor = new DateTime(2026, 10, 15), Cost = 25000m, CreatedAt = new DateTime(2026, 9, 1, 0, 0, 0, DateTimeKind.Utc) },
-            new MaintenanceOrder { Id = 2, WorkOrderCode = "OT-2026-0002", AssetId = 2, MaintenanceTypeId = 3, SupplierId = 2, Title = "Inspección de seguridad", Description = "Verificar broca, cableado y fijación de la herramienta", Priority = "High", Status = "Completed", ScheduledFor = new DateTime(2026, 8, 20), StartedAt = new DateTime(2026, 8, 20, 8, 0, 0, DateTimeKind.Utc), CompletedAt = new DateTime(2026, 8, 20, 10, 0, 0, DateTimeKind.Utc), Cost = 18000m, Findings = "Equipo operativo; se ajustó la base", CreatedAt = new DateTime(2026, 8, 10, 0, 0, 0, DateTimeKind.Utc) },
-            new MaintenanceOrder { Id = 3, WorkOrderCode = "OT-2026-0003", AssetId = 3, MaintenanceTypeId = 1, Title = "Revisión de estructura", Description = "Ajustar uniones y comprobar estabilidad", Priority = "Low", Status = "Planned", ScheduledFor = new DateTime(2026, 11, 5), CreatedAt = new DateTime(2026, 9, 5, 0, 0, 0, DateTimeKind.Utc) });
+
+        modelBuilder.SeedCatalogs();
     }
 }
