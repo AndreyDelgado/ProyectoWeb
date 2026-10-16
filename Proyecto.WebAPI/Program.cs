@@ -1,5 +1,8 @@
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Proyecto.Application.Mapper;
 using Proyecto.Domain.DTO.PatternResult;
 using Proyecto.Infraestructure.Data;
 using Scalar.AspNetCore;
@@ -31,6 +34,16 @@ builder.Services.AddControllers()
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Mapster: Pattern Mapper
+// 1. Registrar las configuraciones personalizadas
+MapsterConfig.RegisterMaps();
+// 2. Tomar la configuración global donde quedaron registradas
+var config = TypeAdapterConfig.GlobalSettings;
+// 3. Registrar Mapster en el contenedor para inyectar IMapper en los servicios
+builder.Services.AddSingleton(config);
+builder.Services.AddScoped<IMapper, ServiceMapper>();
+builder.Services.AddMapster();
 
 var app = builder.Build();
 
