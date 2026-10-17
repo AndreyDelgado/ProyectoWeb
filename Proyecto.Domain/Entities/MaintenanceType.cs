@@ -6,5 +6,7 @@ public class MaintenanceType
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
     public int? DefaultIntervalDays { get; set; }
+    public int? RequiredSpecialtyId { get; set; }
+    public Specialty? RequiredSpecialty { get; set; }
     public ICollection<MaintenanceOrder> MaintenanceOrders { get; set; } = new List<MaintenanceOrder>();
 }

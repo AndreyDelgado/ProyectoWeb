@@ -12,6 +12,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Asset> Assets => Set<Asset>();
     public DbSet<MaintenanceType> MaintenanceTypes => Set<MaintenanceType>();
     public DbSet<MaintenanceOrder> MaintenanceOrders => Set<MaintenanceOrder>();
+    public DbSet<Technician> Technicians => Set<Technician>();
+    public DbSet<Specialty> Specialties => Set<Specialty>();
+    public DbSet<TechnicianSpecialty> TechnicianSpecialties => Set<TechnicianSpecialty>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -85,6 +88,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.Property(type => type.Name).HasMaxLength(80).IsRequired();
             entity.Property(type => type.Description).HasMaxLength(250);
             entity.HasIndex(type => type.Name).IsUnique();
+            entity.HasOne(type => type.RequiredSpecialty).WithMany(specialty => specialty.MaintenanceTypes)
+                .HasForeignKey(type => type.RequiredSpecialtyId).OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<MaintenanceOrder>(entity =>
@@ -112,6 +117,42 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .HasForeignKey(order => order.MaintenanceTypeId).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne(order => order.Supplier).WithMany(supplier => supplier.MaintenanceOrders)
                 .HasForeignKey(order => order.SupplierId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Technician>(entity =>
+        {
+            entity.ToTable("Technicians", table =>
+                table.HasCheckConstraint("CK_Technicians_HourlyRate", "[HourlyRate] >= 0"));
+            entity.HasKey(technician => technician.Id);
+            entity.Property(technician => technician.FullName).HasMaxLength(150).IsRequired();
+            entity.Property(technician => technician.IdentificationNumber).HasMaxLength(30).IsRequired();
+            entity.Property(technician => technician.Email).HasMaxLength(254).IsRequired();
+            entity.Property(technician => technician.Phone).HasMaxLength(30).IsRequired();
+            entity.Property(technician => technician.IsAvailable).HasDefaultValue(true);
+            entity.Property(technician => technician.HourlyRate).HasPrecision(18, 2);
+            entity.HasIndex(technician => technician.IdentificationNumber).IsUnique();
+        });
+
+        modelBuilder.Entity<Specialty>(entity =>
+        {
+            entity.ToTable("Specialties");
+            entity.HasKey(specialty => specialty.Id);
+            entity.Property(specialty => specialty.Name).HasMaxLength(100).IsRequired();
+            entity.Property(specialty => specialty.Description).HasMaxLength(250);
+            entity.HasIndex(specialty => specialty.Name).IsUnique();
+        });
+
+        modelBuilder.Entity<TechnicianSpecialty>(entity =>
+        {
+            entity.ToTable("TechnicianSpecialties", table =>
+                table.HasCheckConstraint("CK_TechnicianSpecialties_CertificationLevel", "[CertificationLevel] IN ('Basic', 'Intermediate', 'Advanced')"));
+            entity.HasKey(link => new { link.TechnicianId, link.SpecialtyId });
+            entity.Property(link => link.CertificationLevel).HasMaxLength(20).IsRequired();
+            entity.Property(link => link.CertifiedSince).HasColumnType("date");
+            entity.HasOne(link => link.Technician).WithMany(technician => technician.TechnicianSpecialties)
+                .HasForeignKey(link => link.TechnicianId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(link => link.Specialty).WithMany(specialty => specialty.TechnicianSpecialties)
+                .HasForeignKey(link => link.SpecialtyId).OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.SeedCatalogs();
