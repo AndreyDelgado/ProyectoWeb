@@ -430,10 +430,15 @@ namespace Proyecto.Infraestructure.Migrations
                         .HasMaxLength(80)
                         .HasColumnType("nvarchar(80)");
 
+                    b.Property<int?>("RequiredSpecialtyId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
                         .IsUnique();
+
+                    b.HasIndex("RequiredSpecialtyId");
 
                     b.ToTable("MaintenanceTypes", null, t =>
                         {
@@ -461,6 +466,31 @@ namespace Proyecto.Infraestructure.Migrations
                             Description = "Revisión general del estado del activo",
                             Name = "Inspección"
                         });
+                });
+
+            modelBuilder.Entity("Proyecto.Domain.Entities.Specialty", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Specialties", (string)null);
                 });
 
             modelBuilder.Entity("Proyecto.Domain.Entities.Supplier", b =>
@@ -534,6 +564,80 @@ namespace Proyecto.Infraestructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Proyecto.Domain.Entities.Technician", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("nvarchar(254)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<decimal>("HourlyRate")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("IdentificationNumber")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<bool>("IsAvailable")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdentificationNumber")
+                        .IsUnique();
+
+                    b.ToTable("Technicians", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Technicians_HourlyRate", "[HourlyRate] >= 0");
+                        });
+                });
+
+            modelBuilder.Entity("Proyecto.Domain.Entities.TechnicianSpecialty", b =>
+                {
+                    b.Property<int>("TechnicianId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SpecialtyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CertificationLevel")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("CertifiedSince")
+                        .HasColumnType("date");
+
+                    b.HasKey("TechnicianId", "SpecialtyId");
+
+                    b.HasIndex("SpecialtyId");
+
+                    b.ToTable("TechnicianSpecialties", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_TechnicianSpecialties_CertificationLevel", "[CertificationLevel] IN ('Basic', 'Intermediate', 'Advanced')");
+                        });
+                });
+
             modelBuilder.Entity("Proyecto.Domain.Entities.Asset", b =>
                 {
                     b.HasOne("Proyecto.Domain.Entities.AssetCategory", "Category")
@@ -586,6 +690,35 @@ namespace Proyecto.Infraestructure.Migrations
                     b.Navigation("Supplier");
                 });
 
+            modelBuilder.Entity("Proyecto.Domain.Entities.MaintenanceType", b =>
+                {
+                    b.HasOne("Proyecto.Domain.Entities.Specialty", "RequiredSpecialty")
+                        .WithMany("MaintenanceTypes")
+                        .HasForeignKey("RequiredSpecialtyId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("RequiredSpecialty");
+                });
+
+            modelBuilder.Entity("Proyecto.Domain.Entities.TechnicianSpecialty", b =>
+                {
+                    b.HasOne("Proyecto.Domain.Entities.Specialty", "Specialty")
+                        .WithMany("TechnicianSpecialties")
+                        .HasForeignKey("SpecialtyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Proyecto.Domain.Entities.Technician", "Technician")
+                        .WithMany("TechnicianSpecialties")
+                        .HasForeignKey("TechnicianId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Specialty");
+
+                    b.Navigation("Technician");
+                });
+
             modelBuilder.Entity("Proyecto.Domain.Entities.Asset", b =>
                 {
                     b.Navigation("MaintenanceOrders");
@@ -606,11 +739,23 @@ namespace Proyecto.Infraestructure.Migrations
                     b.Navigation("MaintenanceOrders");
                 });
 
+            modelBuilder.Entity("Proyecto.Domain.Entities.Specialty", b =>
+                {
+                    b.Navigation("MaintenanceTypes");
+
+                    b.Navigation("TechnicianSpecialties");
+                });
+
             modelBuilder.Entity("Proyecto.Domain.Entities.Supplier", b =>
                 {
                     b.Navigation("Assets");
 
                     b.Navigation("MaintenanceOrders");
+                });
+
+            modelBuilder.Entity("Proyecto.Domain.Entities.Technician", b =>
+                {
+                    b.Navigation("TechnicianSpecialties");
                 });
 #pragma warning restore 612, 618
         }
