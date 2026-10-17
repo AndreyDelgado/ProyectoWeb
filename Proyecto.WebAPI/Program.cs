@@ -2,9 +2,13 @@ using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Proyecto.Application.Implementation;
+using Proyecto.Application.Interfaces;
 using Proyecto.Application.Mapper;
 using Proyecto.Domain.DTO.PatternResult;
 using Proyecto.Infraestructure.Data;
+using Proyecto.Infraestructure.Implementation;
+using Proyecto.Infraestructure.Interfaces;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +38,10 @@ builder.Services.AddControllers()
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// AssetCategory
+builder.Services.AddScoped<IAssetCategoryRepository, AssetCategoryRepository>();
+builder.Services.AddScoped<IAssetCategoryService, AssetCategoryService>();
 
 // Mapster: Pattern Mapper
 // 1. Registrar las configuraciones personalizadas
