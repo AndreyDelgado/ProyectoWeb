@@ -50,9 +50,20 @@ namespace Proyecto.Infraestructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("SYSUTCDATETIME()");
 
+                    b.Property<string>("Criticality")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)")
+                        .HasDefaultValue("Medium");
+
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Image")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("LocationId")
                         .HasColumnType("int");
@@ -79,9 +90,15 @@ namespace Proyecto.Infraestructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)")
-                        .HasDefaultValue("Active");
+                        .HasDefaultValue("Operational");
 
                     b.Property<int?>("SupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsageHours")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsageHoursAtLastMaintenance")
                         .HasColumnType("int");
 
                     b.Property<int>("UsefulLifeMonths")
@@ -104,9 +121,13 @@ namespace Proyecto.Infraestructure.Migrations
 
                     b.ToTable("Assets", null, t =>
                         {
+                            t.HasCheckConstraint("CK_Assets_Criticality", "[Criticality] IN ('High', 'Medium', 'Low')");
+
                             t.HasCheckConstraint("CK_Assets_PurchaseCost", "[PurchaseCost] >= 0");
 
-                            t.HasCheckConstraint("CK_Assets_Status", "[Status] IN ('Active', 'UnderMaintenance', 'Retired')");
+                            t.HasCheckConstraint("CK_Assets_Status", "[Status] IN ('Operational', 'UnderMaintenance', 'OutOfService', 'Decommissioned')");
+
+                            t.HasCheckConstraint("CK_Assets_UsageHours", "[UsageHours] >= 0 AND [UsageHoursAtLastMaintenance] >= 0 AND [UsageHoursAtLastMaintenance] <= [UsageHours]");
 
                             t.HasCheckConstraint("CK_Assets_UsefulLifeMonths", "[UsefulLifeMonths] > 0");
                         });
@@ -120,14 +141,17 @@ namespace Proyecto.Infraestructure.Migrations
                             Brand = "Dell",
                             CategoryId = 1,
                             CreatedAt = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Criticality = "Medium",
                             Description = "Equipo portátil de oficina",
                             LocationId = 1,
                             Model = "Latitude 5440",
                             Name = "Laptop de administración",
                             PurchaseCost = 625000m,
                             SerialNumber = "SN-DELL-0001",
-                            Status = "Active",
+                            Status = "Operational",
                             SupplierId = 1,
+                            UsageHours = 1800,
+                            UsageHoursAtLastMaintenance = 0,
                             UsefulLifeMonths = 48
                         },
                         new
@@ -138,14 +162,17 @@ namespace Proyecto.Infraestructure.Migrations
                             Brand = "Bosch",
                             CategoryId = 3,
                             CreatedAt = new DateTime(2023, 8, 10, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Criticality = "High",
                             Description = "Taladro para trabajos de taller",
                             LocationId = 2,
                             Model = "GBM 13-2 RE",
                             Name = "Taladro de banco",
                             PurchaseCost = 185000m,
                             SerialNumber = "SN-BOSCH-0002",
-                            Status = "Active",
+                            Status = "Operational",
                             SupplierId = 2,
+                            UsageHours = 950,
+                            UsageHoursAtLastMaintenance = 600,
                             UsefulLifeMonths = 72
                         },
                         new
@@ -156,12 +183,15 @@ namespace Proyecto.Infraestructure.Migrations
                             Brand = "Oficina CR",
                             CategoryId = 2,
                             CreatedAt = new DateTime(2022, 3, 2, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Criticality = "Low",
                             Description = "Módulo de recepción",
                             LocationId = 1,
                             Model = "Recepción 180",
                             Name = "Escritorio de recepción",
                             PurchaseCost = 210000m,
-                            Status = "Active",
+                            Status = "Operational",
+                            UsageHours = 0,
+                            UsageHoursAtLastMaintenance = 0,
                             UsefulLifeMonths = 120
                         });
                 });
@@ -173,6 +203,11 @@ namespace Proyecto.Infraestructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CodePrefix")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
 
                     b.Property<string>("Description")
                         .HasMaxLength(250)
@@ -188,34 +223,51 @@ namespace Proyecto.Infraestructure.Migrations
                         .HasMaxLength(80)
                         .HasColumnType("nvarchar(80)");
 
+                    b.Property<int>("PreventiveThresholdHours")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CodePrefix")
+                        .IsUnique();
 
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("AssetCategories", (string)null);
+                    b.ToTable("AssetCategories", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_AssetCategories_CodePrefix", "LEN([CodePrefix]) BETWEEN 2 AND 5 AND [CodePrefix] NOT LIKE '%[^A-Z]%' COLLATE Latin1_General_BIN");
+
+                            t.HasCheckConstraint("CK_AssetCategories_PreventiveThresholdHours", "[PreventiveThresholdHours] > 0");
+                        });
 
                     b.HasData(
                         new
                         {
                             Id = 1,
+                            CodePrefix = "COMP",
                             Description = "Computadoras y periféricos",
                             IsActive = true,
-                            Name = "Equipo de cómputo"
+                            Name = "Equipo de cómputo",
+                            PreventiveThresholdHours = 2000
                         },
                         new
                         {
                             Id = 2,
+                            CodePrefix = "MOB",
                             Description = "Muebles y estaciones de trabajo",
                             IsActive = true,
-                            Name = "Mobiliario"
+                            Name = "Mobiliario",
+                            PreventiveThresholdHours = 4000
                         },
                         new
                         {
                             Id = 3,
+                            CodePrefix = "IND",
                             Description = "Máquinas y herramientas de producción",
                             IsActive = true,
-                            Name = "Equipo industrial"
+                            Name = "Equipo industrial",
+                            PreventiveThresholdHours = 500
                         });
                 });
 

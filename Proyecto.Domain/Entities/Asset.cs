@@ -12,7 +12,11 @@ public class Asset
     public DateTime AcquiredOn { get; set; }
     public decimal PurchaseCost { get; set; }
     public int UsefulLifeMonths { get; set; }
-    public string Status { get; set; } = "Active";
+    public string Status { get; set; } = "Operational";
+    public string? Image { get; set; }
+    public int UsageHours { get; set; }
+    public int UsageHoursAtLastMaintenance { get; set; }
+    public string Criticality { get; set; } = "Medium";
     public int CategoryId { get; set; }
     public AssetCategory Category { get; set; } = null!;
     public int LocationId { get; set; }

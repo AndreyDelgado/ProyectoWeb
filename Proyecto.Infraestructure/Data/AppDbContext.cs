@@ -20,12 +20,20 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     {
         modelBuilder.Entity<AssetCategory>(entity =>
         {
-            entity.ToTable("AssetCategories");
+            entity.ToTable("AssetCategories", table =>
+            {
+                table.HasCheckConstraint("CK_AssetCategories_PreventiveThresholdHours", "[PreventiveThresholdHours] > 0");
+                // COLLATE binario: con la intercalación por defecto (CI), [A-Z] también aceptaría minúsculas
+                table.HasCheckConstraint("CK_AssetCategories_CodePrefix",
+                    "LEN([CodePrefix]) BETWEEN 2 AND 5 AND [CodePrefix] NOT LIKE '%[^A-Z]%' COLLATE Latin1_General_BIN");
+            });
             entity.HasKey(category => category.Id);
             entity.Property(category => category.Name).HasMaxLength(80).IsRequired();
             entity.Property(category => category.Description).HasMaxLength(250);
+            entity.Property(category => category.CodePrefix).HasMaxLength(5).IsRequired();
             entity.Property(category => category.IsActive).HasDefaultValue(true);
             entity.HasIndex(category => category.Name).IsUnique();
+            entity.HasIndex(category => category.CodePrefix).IsUnique();
         });
 
         modelBuilder.Entity<Location>(entity =>
@@ -58,7 +66,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             {
                 table.HasCheckConstraint("CK_Assets_PurchaseCost", "[PurchaseCost] >= 0");
                 table.HasCheckConstraint("CK_Assets_UsefulLifeMonths", "[UsefulLifeMonths] > 0");
-                table.HasCheckConstraint("CK_Assets_Status", "[Status] IN ('Active', 'UnderMaintenance', 'Retired')");
+                table.HasCheckConstraint("CK_Assets_Status", "[Status] IN ('Operational', 'UnderMaintenance', 'OutOfService', 'Decommissioned')");
+                table.HasCheckConstraint("CK_Assets_Criticality", "[Criticality] IN ('High', 'Medium', 'Low')");
+                table.HasCheckConstraint("CK_Assets_UsageHours",
+                    "[UsageHours] >= 0 AND [UsageHoursAtLastMaintenance] >= 0 AND [UsageHoursAtLastMaintenance] <= [UsageHours]");
             });
             entity.HasKey(asset => asset.Id);
             entity.Property(asset => asset.AssetCode).HasMaxLength(30).IsRequired();
@@ -68,7 +79,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.Property(asset => asset.Model).HasMaxLength(80);
             entity.Property(asset => asset.SerialNumber).HasMaxLength(100);
             entity.Property(asset => asset.PurchaseCost).HasPrecision(18, 2);
-            entity.Property(asset => asset.Status).HasMaxLength(20).HasDefaultValue("Active").IsRequired();
+            entity.Property(asset => asset.Status).HasMaxLength(20).HasDefaultValue("Operational").IsRequired();
+            entity.Property(asset => asset.Image).HasMaxLength(200);
+            entity.Property(asset => asset.Criticality).HasMaxLength(10).HasDefaultValue("Medium").IsRequired();
             entity.Property(asset => asset.CreatedAt).HasDefaultValueSql("SYSUTCDATETIME()");
             entity.HasIndex(asset => asset.AssetCode).IsUnique();
             entity.HasIndex(asset => asset.SerialNumber).IsUnique().HasFilter("[SerialNumber] IS NOT NULL");
