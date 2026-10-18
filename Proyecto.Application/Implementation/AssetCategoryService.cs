@@ -73,6 +73,11 @@ public class AssetCategoryService : IAssetCategoryService
             return Result<AssetCategoryDetailDto>.Failure(409, "Conflict",
                 $"Ya existe una categoría con el nombre {category.Name}.");
 
+        // Regla de negocio: el prefijo de código no se puede repetir
+        if (await _repository.ExistsByCodePrefixAsync(category.CodePrefix!))
+            return Result<AssetCategoryDetailDto>.Failure(409, "Conflict",
+                $"Ya existe una categoría con el prefijo {category.CodePrefix}.");
+
         var entity = _mapper.Map<AssetCategory>(category);
         entity.IsActive = true;                    // Toda categoría nueva se crea activa
 
@@ -96,6 +101,10 @@ public class AssetCategoryService : IAssetCategoryService
         if (await _repository.ExistsByNameAsync(category.Name!, id))
             return Result<AssetCategoryDetailDto>.Failure(409, "Conflict",
                 $"Ya existe una categoría con el nombre {category.Name}.");
+
+        if (await _repository.ExistsByCodePrefixAsync(category.CodePrefix!, id))
+            return Result<AssetCategoryDetailDto>.Failure(409, "Conflict",
+                $"Ya existe una categoría con el prefijo {category.CodePrefix}.");
 
         var entity = _mapper.Map<AssetCategory>(category);
         entity.Id = id;                            // El Id se toma de la ruta, no del body

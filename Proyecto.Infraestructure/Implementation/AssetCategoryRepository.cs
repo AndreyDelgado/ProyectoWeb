@@ -75,6 +75,16 @@ public class AssetCategoryRepository : IAssetCategoryRepository
         return result;
     }
 
+    // excludeId: Id de la categoría que se excluye de la verificación al editar
+    public async Task<bool> ExistsByCodePrefixAsync(string codePrefix, int? excludeId = null)
+    {
+        var result = await _context.AssetCategories
+            .AnyAsync(c => c.CodePrefix == codePrefix
+                        && (excludeId == null || c.Id != excludeId));
+
+        return result;
+    }
+
     public async Task<bool> HasAssetsAsync(int id)
     {
         var result = await _context.Assets

@@ -13,6 +13,7 @@ public interface IAssetCategoryRepository
     // Verificaciones para las reglas de negocio
     Task<bool> ExistsAsync(int id);
     Task<bool> ExistsByNameAsync(string name, int? excludeId = null);
+    Task<bool> ExistsByCodePrefixAsync(string codePrefix, int? excludeId = null);
     Task<bool> HasAssetsAsync(int id);
 
     // Escritura
