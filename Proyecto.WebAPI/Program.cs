@@ -43,6 +43,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IAssetCategoryRepository, AssetCategoryRepository>();
 builder.Services.AddScoped<IAssetCategoryService, AssetCategoryService>();
 
+// Asset
+builder.Services.AddScoped<IAssetRepository, AssetRepository>();
+builder.Services.AddScoped<IAssetService, AssetService>();
+
 // Mapster: Pattern Mapper
 // 1. Registrar las configuraciones personalizadas
 MapsterConfig.RegisterMaps();

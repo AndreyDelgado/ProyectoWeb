@@ -6,6 +6,9 @@ namespace Proyecto.Application.Mapper;
 
 public static class MapsterConfig
 {
+    // Ruta pública donde se sirven las imágenes de los activos
+    public const string AssetImagesUrl = "/images/assets/";
+
     public static void RegisterMaps()
     {
         // AssetCategory
@@ -18,5 +21,46 @@ public static class MapsterConfig
         TypeAdapterConfig<AssetCategoryUpdateDto, AssetCategory>
             .NewConfig()
             .Ignore(dest => dest.Id);              // Se toma del parámetro de la ruta
+
+        // Asset
+        // Los nombres de las relaciones requieren Include en el repositorio.
+        TypeAdapterConfig<Asset, AssetListDto>
+            .NewConfig()
+            .Map(dest => dest.CategoryName, src => src.Category.Name)
+            .Map(dest => dest.LocationName, src => src.Location.Name)
+            .Map(dest => dest.ImageUrl, src => string.IsNullOrEmpty(src.Image) ? null : AssetImagesUrl + src.Image);
+
+        TypeAdapterConfig<Asset, AssetDetailDto>
+            .NewConfig()
+            .Map(dest => dest.CategoryName, src => src.Category.Name)
+            .Map(dest => dest.LocationName, src => src.Location.Name)
+            .Map(dest => dest.SupplierName, src => src.Supplier == null ? null : src.Supplier.Name)
+            .Map(dest => dest.ImageUrl, src => string.IsNullOrEmpty(src.Image) ? null : AssetImagesUrl + src.Image);
+
+        // En los DTOs de entrada se ignoran los campos que asigna el servidor
+        TypeAdapterConfig<AssetCreateDto, Asset>
+            .NewConfig()
+            .Ignore(dest => dest.Id,
+                    dest => dest.AssetCode,
+                    dest => dest.Status,
+                    dest => dest.UsageHoursAtLastMaintenance,
+                    dest => dest.CreatedAt,
+                    dest => dest.Category,
+                    dest => dest.Location,
+                    dest => dest.Supplier!,
+                    dest => dest.MaintenanceOrders);
+
+        TypeAdapterConfig<AssetUpdateDto, Asset>
+            .NewConfig()
+            .Ignore(dest => dest.Id,
+                    dest => dest.AssetCode,
+                    dest => dest.Status,
+                    dest => dest.Image!,
+                    dest => dest.UsageHoursAtLastMaintenance,
+                    dest => dest.CreatedAt,
+                    dest => dest.Category,
+                    dest => dest.Location,
+                    dest => dest.Supplier!,
+                    dest => dest.MaintenanceOrders);
     }
 }
