@@ -16,7 +16,7 @@ public class AssetService : IAssetService
     public const string StatusDecommissioned = "Decommissioned";
 
     // Estados en los que una orden se considera cerrada; cualquier otro estado impide la baja del activo
-    public static readonly string[] ClosedOrderStatuses = ["Completed", "Cancelled"];
+    public static readonly string[] ClosedOrderStatuses = ["Completed", "Rejected", "Cancelled"];
 
     public const long MaxImageSize = 2 * 1024 * 1024;
     public static readonly string[] AllowedImageExtensions = [".jpg", ".jpeg", ".png", ".webp"];

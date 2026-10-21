@@ -335,12 +335,8 @@ namespace Proyecto.Infraestructure.Migrations
                     b.Property<int>("AssetId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("CompletedAt")
+                    b.Property<DateTime?>("ClosedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<decimal?>("Cost")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -365,7 +361,17 @@ namespace Proyecto.Infraestructure.Migrations
                         .HasColumnType("nvarchar(16)")
                         .HasDefaultValue("Medium");
 
-                    b.Property<DateTime>("ScheduledFor")
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("RequestedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<DateTime?>("ScheduledFor")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("StartedAt")
@@ -376,7 +382,7 @@ namespace Proyecto.Infraestructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)")
-                        .HasDefaultValue("Planned");
+                        .HasDefaultValue("Requested");
 
                     b.Property<int?>("SupplierId")
                         .HasColumnType("int");
@@ -385,6 +391,10 @@ namespace Proyecto.Infraestructure.Migrations
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
+
+                    b.Property<decimal?>("TotalCost")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("WorkOrderCode")
                         .IsRequired()
@@ -404,13 +414,13 @@ namespace Proyecto.Infraestructure.Migrations
 
                     b.ToTable("MaintenanceOrders", null, t =>
                         {
-                            t.HasCheckConstraint("CK_MaintenanceOrders_Cost", "[Cost] IS NULL OR [Cost] >= 0");
-
-                            t.HasCheckConstraint("CK_MaintenanceOrders_DateOrder", "[CompletedAt] IS NULL OR [StartedAt] IS NULL OR [CompletedAt] >= [StartedAt]");
+                            t.HasCheckConstraint("CK_MaintenanceOrders_DateOrder", "[ClosedAt] IS NULL OR [StartedAt] IS NULL OR [ClosedAt] >= [StartedAt]");
 
                             t.HasCheckConstraint("CK_MaintenanceOrders_Priority", "[Priority] IN ('Low', 'Medium', 'High', 'Urgent')");
 
-                            t.HasCheckConstraint("CK_MaintenanceOrders_Status", "[Status] IN ('Planned', 'InProgress', 'Completed', 'Cancelled')");
+                            t.HasCheckConstraint("CK_MaintenanceOrders_Status", "[Status] IN ('Requested', 'Diagnosed', 'Approved', 'InProgress', 'WaitingForParts', 'Completed', 'Rejected', 'Cancelled')");
+
+                            t.HasCheckConstraint("CK_MaintenanceOrders_TotalCost", "[TotalCost] IS NULL OR [TotalCost] >= 0");
                         });
 
                     b.HasData(
@@ -418,33 +428,37 @@ namespace Proyecto.Infraestructure.Migrations
                         {
                             Id = 1,
                             AssetId = 1,
-                            Cost = 25000m,
                             CreatedAt = new DateTime(2026, 9, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Limpieza interna, revisión de batería y diagnóstico",
                             MaintenanceTypeId = 1,
                             Priority = "Medium",
+                            Reason = "Mantenimiento preventivo según el intervalo de 90 días",
+                            RequestedAt = new DateTime(2026, 9, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ScheduledFor = new DateTime(2026, 10, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Status = "Planned",
+                            Status = "Requested",
                             SupplierId = 1,
                             Title = "Limpieza y revisión preventiva",
+                            TotalCost = 25000m,
                             WorkOrderCode = "OT-2026-0001"
                         },
                         new
                         {
                             Id = 2,
                             AssetId = 2,
-                            CompletedAt = new DateTime(2026, 8, 20, 10, 0, 0, 0, DateTimeKind.Utc),
-                            Cost = 18000m,
+                            ClosedAt = new DateTime(2026, 8, 20, 10, 0, 0, 0, DateTimeKind.Utc),
                             CreatedAt = new DateTime(2026, 8, 10, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Verificar broca, cableado y fijación de la herramienta",
                             Findings = "Equipo operativo; se ajustó la base",
                             MaintenanceTypeId = 3,
                             Priority = "High",
+                            Reason = "Inspección periódica de seguridad del equipo de taller",
+                            RequestedAt = new DateTime(2026, 8, 10, 0, 0, 0, 0, DateTimeKind.Utc),
                             ScheduledFor = new DateTime(2026, 8, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             StartedAt = new DateTime(2026, 8, 20, 8, 0, 0, 0, DateTimeKind.Utc),
                             Status = "Completed",
                             SupplierId = 2,
                             Title = "Inspección de seguridad",
+                            TotalCost = 18000m,
                             WorkOrderCode = "OT-2026-0002"
                         },
                         new
@@ -455,8 +469,10 @@ namespace Proyecto.Infraestructure.Migrations
                             Description = "Ajustar uniones y comprobar estabilidad",
                             MaintenanceTypeId = 1,
                             Priority = "Low",
+                            Reason = "Se reportan uniones flojas en el módulo de recepción",
+                            RequestedAt = new DateTime(2026, 9, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             ScheduledFor = new DateTime(2026, 11, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Status = "Planned",
+                            Status = "Requested",
                             Title = "Revisión de estructura",
                             WorkOrderCode = "OT-2026-0003"
                         });
@@ -476,6 +492,11 @@ namespace Proyecto.Infraestructure.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
+
+                    b.Property<bool>("IsEmergency")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -503,12 +524,14 @@ namespace Proyecto.Infraestructure.Migrations
                             Id = 1,
                             DefaultIntervalDays = 90,
                             Description = "Mantenimiento programado para prevenir fallas",
+                            IsEmergency = false,
                             Name = "Preventivo"
                         },
                         new
                         {
                             Id = 2,
                             Description = "Reparación de una falla reportada",
+                            IsEmergency = false,
                             Name = "Correctivo"
                         },
                         new
@@ -516,6 +539,7 @@ namespace Proyecto.Infraestructure.Migrations
                             Id = 3,
                             DefaultIntervalDays = 180,
                             Description = "Revisión general del estado del activo",
+                            IsEmergency = false,
                             Name = "Inspección"
                         });
                 });
@@ -564,6 +588,10 @@ namespace Proyecto.Infraestructure.Migrations
                     b.Property<string>("Email")
                         .HasMaxLength(254)
                         .HasColumnType("nvarchar(254)");
+
+                    b.Property<string>("GeneralConditions")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()

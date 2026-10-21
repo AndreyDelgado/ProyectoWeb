@@ -9,6 +9,7 @@ public class Supplier
     public string? Phone { get; set; }
     public string? Email { get; set; }
     public string? Address { get; set; }
+    public string? GeneralConditions { get; set; }
     public bool IsActive { get; set; } = true;
     public ICollection<Asset> Assets { get; set; } = new List<Asset>();
     public ICollection<MaintenanceOrder> MaintenanceOrders { get; set; } = new List<MaintenanceOrder>();

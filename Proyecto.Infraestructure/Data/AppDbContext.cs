@@ -56,6 +56,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.Property(supplier => supplier.Phone).HasMaxLength(30);
             entity.Property(supplier => supplier.Email).HasMaxLength(254);
             entity.Property(supplier => supplier.Address).HasMaxLength(250);
+            entity.Property(supplier => supplier.GeneralConditions).HasMaxLength(500);
             entity.Property(supplier => supplier.IsActive).HasDefaultValue(true);
             entity.HasIndex(supplier => supplier.TaxId).IsUnique();
         });
@@ -100,6 +101,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.HasKey(type => type.Id);
             entity.Property(type => type.Name).HasMaxLength(80).IsRequired();
             entity.Property(type => type.Description).HasMaxLength(250);
+            entity.Property(type => type.IsEmergency).HasDefaultValue(false);
             entity.HasIndex(type => type.Name).IsUnique();
             entity.HasOne(type => type.RequiredSpecialty).WithMany(specialty => specialty.MaintenanceTypes)
                 .HasForeignKey(type => type.RequiredSpecialtyId).OnDelete(DeleteBehavior.Restrict);
@@ -110,17 +112,20 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.ToTable("MaintenanceOrders", table =>
             {
                 table.HasCheckConstraint("CK_MaintenanceOrders_Priority", "[Priority] IN ('Low', 'Medium', 'High', 'Urgent')");
-                table.HasCheckConstraint("CK_MaintenanceOrders_Status", "[Status] IN ('Planned', 'InProgress', 'Completed', 'Cancelled')");
-                table.HasCheckConstraint("CK_MaintenanceOrders_Cost", "[Cost] IS NULL OR [Cost] >= 0");
-                table.HasCheckConstraint("CK_MaintenanceOrders_DateOrder", "[CompletedAt] IS NULL OR [StartedAt] IS NULL OR [CompletedAt] >= [StartedAt]");
+                table.HasCheckConstraint("CK_MaintenanceOrders_Status",
+                    "[Status] IN ('Requested', 'Diagnosed', 'Approved', 'InProgress', 'WaitingForParts', 'Completed', 'Rejected', 'Cancelled')");
+                table.HasCheckConstraint("CK_MaintenanceOrders_TotalCost", "[TotalCost] IS NULL OR [TotalCost] >= 0");
+                table.HasCheckConstraint("CK_MaintenanceOrders_DateOrder", "[ClosedAt] IS NULL OR [StartedAt] IS NULL OR [ClosedAt] >= [StartedAt]");
             });
             entity.HasKey(order => order.Id);
             entity.Property(order => order.WorkOrderCode).HasMaxLength(30).IsRequired();
             entity.Property(order => order.Title).HasMaxLength(150).IsRequired();
             entity.Property(order => order.Description).HasMaxLength(1000);
+            entity.Property(order => order.Reason).HasMaxLength(500).IsRequired();
             entity.Property(order => order.Priority).HasMaxLength(16).HasDefaultValue("Medium").IsRequired();
-            entity.Property(order => order.Status).HasMaxLength(20).HasDefaultValue("Planned").IsRequired();
-            entity.Property(order => order.Cost).HasPrecision(18, 2);
+            entity.Property(order => order.Status).HasMaxLength(20).HasDefaultValue("Requested").IsRequired();
+            entity.Property(order => order.RequestedAt).HasDefaultValueSql("SYSUTCDATETIME()");
+            entity.Property(order => order.TotalCost).HasPrecision(18, 2);
             entity.Property(order => order.Findings).HasMaxLength(2000);
             entity.Property(order => order.CreatedAt).HasDefaultValueSql("SYSUTCDATETIME()");
             entity.HasIndex(order => order.WorkOrderCode).IsUnique();
