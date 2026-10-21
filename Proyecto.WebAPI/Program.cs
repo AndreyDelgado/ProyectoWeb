@@ -57,6 +57,10 @@ builder.Services.AddSingleton(config);
 builder.Services.AddScoped<IMapper, ServiceMapper>();
 builder.Services.AddMapster();
 
+// Almacenamiento de imágenes de activos: una sola instancia para toda la aplicación
+var assetImagesPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "images", "assets");
+builder.Services.AddSingleton<IFileStorageService>(new LocalFileStorageService(assetImagesPath));
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -72,6 +76,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+
+app.UseStaticFiles();             // Sirve wwwroot: /images/assets/{nombre}
 
 app.UseAuthorization();
 

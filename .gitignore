@@ -49,3 +49,5 @@ Thumbs.db
 # Secrets (never commit real ones)
 appsettings.*.local.json
 *.env
+Proyecto.WebAPI/wwwroot/images/assets/*
+!Proyecto.WebAPI/wwwroot/images/assets/default.png

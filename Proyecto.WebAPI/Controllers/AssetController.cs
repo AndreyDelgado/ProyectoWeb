@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Proyecto.Application.Interfaces;
 using Proyecto.Domain.DTO;
@@ -77,6 +78,28 @@ public class AssetController : ControllerBase
     public async Task<IActionResult> DeleteAsync(int id)
     {
         var result = await _service.DeleteAsync(id);
+
+        return StatusCode(result.Status, result);
+    }
+
+    // POST api/Asset/{id}/image (multipart/form-data, campo "file")
+    [HttpPost("{id:int}/image")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> UploadImageAsync(int id,
+        [Required(ErrorMessage = "El archivo de imagen es obligatorio.")] IFormFile file)
+    {
+        await using var stream = file.OpenReadStream();
+
+        var result = await _service.UploadImageAsync(id, stream, file.FileName, file.Length);
+
+        return StatusCode(result.Status, result);
+    }
+
+    // DELETE api/Asset/{id}/image
+    [HttpDelete("{id:int}/image")]
+    public async Task<IActionResult> DeleteImageAsync(int id)
+    {
+        var result = await _service.DeleteImageAsync(id);
 
         return StatusCode(result.Status, result);
     }

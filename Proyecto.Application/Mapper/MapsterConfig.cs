@@ -9,6 +9,9 @@ public static class MapsterConfig
     // Ruta pública donde se sirven las imágenes de los activos
     public const string AssetImagesUrl = "/images/assets/";
 
+    // Imagen que se muestra cuando el activo no tiene una propia
+    public const string DefaultAssetImage = "default.png";
+
     public static void RegisterMaps()
     {
         // AssetCategory
@@ -28,14 +31,14 @@ public static class MapsterConfig
             .NewConfig()
             .Map(dest => dest.CategoryName, src => src.Category.Name)
             .Map(dest => dest.LocationName, src => src.Location.Name)
-            .Map(dest => dest.ImageUrl, src => string.IsNullOrEmpty(src.Image) ? null : AssetImagesUrl + src.Image);
+            .Map(dest => dest.ImageUrl, src => AssetImagesUrl + (string.IsNullOrEmpty(src.Image) ? DefaultAssetImage : src.Image));
 
         TypeAdapterConfig<Asset, AssetDetailDto>
             .NewConfig()
             .Map(dest => dest.CategoryName, src => src.Category.Name)
             .Map(dest => dest.LocationName, src => src.Location.Name)
             .Map(dest => dest.SupplierName, src => src.Supplier == null ? null : src.Supplier.Name)
-            .Map(dest => dest.ImageUrl, src => string.IsNullOrEmpty(src.Image) ? null : AssetImagesUrl + src.Image);
+            .Map(dest => dest.ImageUrl, src => AssetImagesUrl + (string.IsNullOrEmpty(src.Image) ? DefaultAssetImage : src.Image));
 
         // En los DTOs de entrada se ignoran los campos que asigna el servidor
         TypeAdapterConfig<AssetCreateDto, Asset>

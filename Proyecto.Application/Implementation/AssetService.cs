@@ -1,5 +1,6 @@
 using MapsterMapper;
 using Proyecto.Application.Interfaces;
+using Proyecto.Application.Mapper;
 using Proyecto.Domain.DTO;
 using Proyecto.Domain.DTO.PatternResult;
 using Proyecto.Domain.Entities;
@@ -17,13 +18,18 @@ public class AssetService : IAssetService
     // Estados en los que una orden se considera cerrada; cualquier otro estado impide la baja del activo
     public static readonly string[] ClosedOrderStatuses = ["Completed", "Cancelled"];
 
+    public const long MaxImageSize = 2 * 1024 * 1024;
+    public static readonly string[] AllowedImageExtensions = [".jpg", ".jpeg", ".png", ".webp"];
+
     private readonly IAssetRepository _repository;
     private readonly IMapper _mapper;
+    private readonly IFileStorageService _fileStorage;
 
-    public AssetService(IAssetRepository repository, IMapper mapper)
+    public AssetService(IAssetRepository repository, IMapper mapper, IFileStorageService fileStorage)
     {
         _repository = repository;
         _mapper = mapper;
+        _fileStorage = fileStorage;
     }
 
     // READ
@@ -202,6 +208,86 @@ public class AssetService : IAssetService
         return result;
     }
 
+    // IMAGE
+
+    // Asigna la imagen o la reemplaza; al reemplazarla se borra el archivo anterior
+    public async Task<Result<string>> UploadImageAsync(int id, Stream content, string fileName, long length)
+    {
+        var entity = await _repository.GetForUpdateAsync(id);
+
+        if (entity is null)
+            return Result<string>.Failure(404, "Not Found", $"El activo {id} no existe.");
+
+        if (entity.Status == StatusDecommissioned)
+            return Result<string>.Failure(409, "Conflict",
+                $"El activo {id} está dado de baja y no se puede cambiar su imagen.");
+
+        if (length == 0)
+            return Result<string>.Failure(400, "Bad Request", "El archivo está vacío.");
+
+        if (length > MaxImageSize)
+            return Result<string>.Failure(400, "Bad Request", "La imagen no puede superar 2 MB.");
+
+        var extension = Path.GetExtension(fileName).ToLowerInvariant();
+
+        if (!AllowedImageExtensions.Contains(extension))
+            return Result<string>.Failure(400, "Bad Request",
+                $"La imagen debe tener una de estas extensiones: {string.Join(", ", AllowedImageExtensions)}.");
+
+        // El nombre lo genera el servidor: evita colisiones y no usa el nombre que envía el cliente
+        var newFileName = $"{Guid.NewGuid()}{extension}";
+        var oldFileName = entity.Image;
+
+        await _fileStorage.SaveAsync(content, newFileName);
+
+        entity.Image = newFileName;
+
+        try
+        {
+            await _repository.SaveChangesAsync();
+        }
+        catch
+        {
+            // Sin este borrado, el archivo quedaría en disco sin ningún activo que lo referencie
+            _fileStorage.Delete(newFileName);
+            throw;
+        }
+
+        DeleteStoredImage(oldFileName);
+
+        var result = Result<string>.Success(newFileName, 200, "OK", "Imagen guardada.");
+
+        return result;
+    }
+
+    public async Task<Result<int>> DeleteImageAsync(int id)
+    {
+        var entity = await _repository.GetForUpdateAsync(id);
+
+        if (entity is null)
+            return Result<int>.Failure(404, "Not Found", $"El activo {id} no existe.");
+
+        if (entity.Status == StatusDecommissioned)
+            return Result<int>.Failure(409, "Conflict",
+                $"El activo {id} está dado de baja y no se puede cambiar su imagen.");
+
+        if (string.IsNullOrWhiteSpace(entity.Image))
+            return Result<int>.Failure(404, "Not Found", $"El activo {id} no tiene imagen.");
+
+        var oldFileName = entity.Image;
+
+        entity.Image = string.Empty;
+
+        // Primero la base de datos: si falla, el archivo se conserva y el activo sigue apuntando a él
+        await _repository.SaveChangesAsync();
+
+        DeleteStoredImage(oldFileName);
+
+        var result = Result<int>.Success(id, 200, "OK", "Imagen eliminada.");
+
+        return result;
+    }
+
     // La ubicación debe existir y el proveedor también, si se indica. Devuelve null si no hay error.
     private async Task<string?> ValidateRelationsAsync(int locationId, int? supplierId)
     {
@@ -224,5 +310,16 @@ public class AssetService : IAssetService
             : 0;
 
         return $"{codePrefix}-{lastNumber + 1:D4}";
+    }
+
+    // La imagen por defecto es compartida por todos los activos y nunca se borra.
+    // La comparación ignora mayúsculas porque el sistema de archivos de Windows también lo hace.
+    private void DeleteStoredImage(string? fileName)
+    {
+        if (string.IsNullOrWhiteSpace(fileName)
+            || string.Equals(Path.GetFileName(fileName), MapsterConfig.DefaultAssetImage, StringComparison.OrdinalIgnoreCase))
+            return;
+
+        _fileStorage.Delete(fileName);
     }
 }

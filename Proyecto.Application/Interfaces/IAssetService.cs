@@ -12,4 +12,6 @@ public interface IAssetService
     Task<Result<AssetDetailDto>> UpdateAsync(int id, AssetUpdateDto asset);
     Task<Result<AssetDetailDto>> UpdateStatusAsync(int id, AssetStatusUpdateDto status);
     Task<Result<int>> DeleteAsync(int id);
+    Task<Result<string>> UploadImageAsync(int id, Stream content, string fileName, long length);
+    Task<Result<int>> DeleteImageAsync(int id);
 }
