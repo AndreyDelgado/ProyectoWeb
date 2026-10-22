@@ -94,6 +94,52 @@ public sealed class CatalogService(AppDbContext context) : ICatalogService
             : Result<TechnicianListDto>.Success(MapTechnician(technician));
     }
 
+    public async Task<Result<TechnicianListDto>> AddTechnicianSpecialtyAsync(
+        int technicianId,
+        int specialtyId,
+        TechnicianSpecialtyRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (request.CertifiedSince == default || request.CertifiedSince > DateOnly.FromDateTime(DateTime.UtcNow))
+        {
+            return Result<TechnicianListDto>.Failure(
+                400, "Bad Request", "La fecha de certificación debe ser válida y no puede estar en el futuro.");
+        }
+
+        var technician = await context.Technicians
+            .FirstOrDefaultAsync(item => item.Id == technicianId, cancellationToken);
+        if (technician is null)
+        {
+            return Result<TechnicianListDto>.Failure(404, "Not Found", $"No existe el técnico con id {technicianId}.");
+        }
+
+        var specialtyExists = await context.Specialties
+            .AnyAsync(item => item.Id == specialtyId, cancellationToken);
+        if (!specialtyExists)
+        {
+            return Result<TechnicianListDto>.Failure(404, "Not Found", $"No existe la especialidad con id {specialtyId}.");
+        }
+
+        var alreadyAssigned = await context.TechnicianSpecialties
+            .AnyAsync(link => link.TechnicianId == technicianId && link.SpecialtyId == specialtyId, cancellationToken);
+        if (alreadyAssigned)
+        {
+            return Result<TechnicianListDto>.Failure(
+                409, "Conflict", "El técnico ya tiene asignada esta especialidad.");
+        }
+
+        context.TechnicianSpecialties.Add(new Domain.Entities.TechnicianSpecialty
+        {
+            TechnicianId = technicianId,
+            SpecialtyId = specialtyId,
+            CertificationLevel = request.CertificationLevel,
+            CertifiedSince = request.CertifiedSince.ToDateTime(TimeOnly.MinValue)
+        });
+        await context.SaveChangesAsync(cancellationToken);
+
+        return await GetTechnicianAsync(technicianId, cancellationToken);
+    }
+
     private static TechnicianListDto MapTechnician(Domain.Entities.Technician technician) =>
         new()
         {

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Proyecto.Application.Interfaces;
+using Proyecto.Domain.DTO;
 
 namespace Proyecto.WebAPI.Controllers;
 
@@ -19,5 +20,16 @@ public sealed class TechniciansController(ICatalogService catalogService) : Cont
     {
         var result = await catalogService.GetTechnicianAsync(id, cancellationToken);
         return StatusCode(result.Status, result);
+    }
+
+    [HttpPost("{id:int}/specialties/{specialtyId:int}")]
+    public async Task<IActionResult> AddSpecialtyAsync(
+        int id,
+        int specialtyId,
+        [FromBody] TechnicianSpecialtyRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await catalogService.AddTechnicianSpecialtyAsync(id, specialtyId, request, cancellationToken);
+        return StatusCode(result.IsSuccess ? 201 : result.Status, result);
     }
 }

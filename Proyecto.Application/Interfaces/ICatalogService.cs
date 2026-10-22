@@ -10,4 +10,9 @@ public interface ICatalogService
     Task<Result<IEnumerable<SpecialtyListDto>>> GetSpecialtiesAsync(CancellationToken cancellationToken);
     Task<Result<IEnumerable<TechnicianListDto>>> GetTechniciansAsync(CancellationToken cancellationToken);
     Task<Result<TechnicianListDto>> GetTechnicianAsync(int id, CancellationToken cancellationToken);
+    Task<Result<TechnicianListDto>> AddTechnicianSpecialtyAsync(
+        int technicianId,
+        int specialtyId,
+        TechnicianSpecialtyRequest request,
+        CancellationToken cancellationToken);
 }

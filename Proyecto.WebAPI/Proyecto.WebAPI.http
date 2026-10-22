@@ -19,3 +19,12 @@ Accept: application/json
 ### Detalle de técnico y certificaciones
 GET {{Proyecto.WebAPI_HostAddress}}/api/technicians/1
 Accept: application/json
+
+### Asignar especialidad a un técnico
+POST {{Proyecto.WebAPI_HostAddress}}/api/technicians/1/specialties/1
+Content-Type: application/json
+
+{
+  "certificationLevel": "Intermediate",
+  "certifiedSince": "2024-01-15"
+}
