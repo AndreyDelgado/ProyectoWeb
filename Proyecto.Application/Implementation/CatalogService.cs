@@ -74,7 +74,28 @@ public sealed class CatalogService(AppDbContext context) : ICatalogService
             .OrderBy(technician => technician.FullName)
             .ToListAsync(cancellationToken);
 
-        var data = technicians.Select(technician => new TechnicianListDto
+        var data = technicians.Select(MapTechnician).ToArray();
+
+        return Result<IEnumerable<TechnicianListDto>>.Success(data);
+    }
+
+    public async Task<Result<TechnicianListDto>> GetTechnicianAsync(
+        int id,
+        CancellationToken cancellationToken)
+    {
+        var technician = await context.Technicians
+            .AsNoTracking()
+            .Include(item => item.TechnicianSpecialties)
+                .ThenInclude(link => link.Specialty)
+            .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
+
+        return technician is null
+            ? Result<TechnicianListDto>.Failure(404, "Not Found", $"No existe el técnico con id {id}.")
+            : Result<TechnicianListDto>.Success(MapTechnician(technician));
+    }
+
+    private static TechnicianListDto MapTechnician(Domain.Entities.Technician technician) =>
+        new()
         {
             Id = technician.Id,
             FullName = technician.FullName,
@@ -93,8 +114,5 @@ public sealed class CatalogService(AppDbContext context) : ICatalogService
                     CertifiedSince = DateOnly.FromDateTime(link.CertifiedSince)
                 })
                 .ToArray()
-        }).ToArray();
-
-        return Result<IEnumerable<TechnicianListDto>>.Success(data);
-    }
+        };
 }

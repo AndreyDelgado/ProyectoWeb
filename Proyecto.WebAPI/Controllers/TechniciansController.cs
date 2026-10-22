@@ -13,4 +13,11 @@ public sealed class TechniciansController(ICatalogService catalogService) : Cont
         var result = await catalogService.GetTechniciansAsync(cancellationToken);
         return StatusCode(result.Status, result);
     }
+
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetByIdAsync(int id, CancellationToken cancellationToken)
+    {
+        var result = await catalogService.GetTechnicianAsync(id, cancellationToken);
+        return StatusCode(result.Status, result);
+    }
 }

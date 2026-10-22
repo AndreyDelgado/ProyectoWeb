@@ -15,3 +15,7 @@ Accept: application/json
 ### Técnicos y sus certificaciones
 GET {{Proyecto.WebAPI_HostAddress}}/api/technicians
 Accept: application/json
+
+### Detalle de técnico y certificaciones
+GET {{Proyecto.WebAPI_HostAddress}}/api/technicians/1
+Accept: application/json

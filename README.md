@@ -25,7 +25,7 @@ Los siguientes endpoints de consulta devuelven respuestas con el formato `Result
 | `GET /api/locations` | Ubicaciones activas, ordenadas por nombre. |
 | `GET /api/maintenance-types` | Tipos de mantenimiento y la especialidad requerida, si existe. |
 | `GET /api/specialties` | Especialidades registradas. |
-| `GET /api/technicians` | Técnicos y sus certificaciones asociadas. |
+| `GET /api/technicians` y `GET /api/technicians/{id}` | Técnicos y sus certificaciones asociadas. |
 
 Las solicitudes de ejemplo están en `Proyecto.WebAPI/Proyecto.WebAPI.http`.
 
