@@ -65,5 +65,20 @@ public static class MapsterConfig
                     dest => dest.Location,
                     dest => dest.Supplier!,
                     dest => dest.MaintenanceOrders);
+
+        // Supplier
+        // Las propiedades de entidad a DTO de salida coinciden por nombre y no requieren configuración.
+        TypeAdapterConfig<SupplierCreateDto, Supplier>
+            .NewConfig()
+            .Ignore(dest => dest.Id,                // Generado por la base de datos (IDENTITY)
+                    dest => dest.IsActive,          // Lo asigna el servicio
+                    dest => dest.Assets,
+                    dest => dest.MaintenanceOrders);
+
+        TypeAdapterConfig<SupplierUpdateDto, Supplier>
+            .NewConfig()
+            .Ignore(dest => dest.Id,                // Se toma del parámetro de la ruta
+                    dest => dest.Assets,
+                    dest => dest.MaintenanceOrders);
     }
 }
