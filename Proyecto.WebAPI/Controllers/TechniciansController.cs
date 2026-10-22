@@ -30,6 +30,18 @@ public sealed class TechniciansController(ICatalogService catalogService) : Cont
         CancellationToken cancellationToken)
     {
         var result = await catalogService.AddTechnicianSpecialtyAsync(id, specialtyId, request, cancellationToken);
-        return StatusCode(result.IsSuccess ? 201 : result.Status, result);
+        return StatusCode(result.Status, result);
+    }
+
+    [HttpDelete("{id:int}/specialties/{specialtyId:int}")]
+    public async Task<IActionResult> RemoveSpecialtyAsync(
+        int id,
+        int specialtyId,
+        CancellationToken cancellationToken)
+    {
+        var result = await catalogService.RemoveTechnicianSpecialtyAsync(id, specialtyId, cancellationToken);
+        return result.IsSuccess
+            ? NoContent()
+            : StatusCode(result.Status, result);
     }
 }

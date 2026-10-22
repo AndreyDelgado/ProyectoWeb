@@ -15,4 +15,8 @@ public interface ICatalogService
         int specialtyId,
         TechnicianSpecialtyRequest request,
         CancellationToken cancellationToken);
+    Task<Result<TechnicianListDto>> RemoveTechnicianSpecialtyAsync(
+        int technicianId,
+        int specialtyId,
+        CancellationToken cancellationToken);
 }

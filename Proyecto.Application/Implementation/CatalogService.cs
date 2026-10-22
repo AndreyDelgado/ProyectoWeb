@@ -137,6 +137,41 @@ public sealed class CatalogService(AppDbContext context) : ICatalogService
         });
         await context.SaveChangesAsync(cancellationToken);
 
+        var result = await GetTechnicianAsync(technicianId, cancellationToken);
+        if (result.IsSuccess)
+        {
+            result.Status = 201;
+            result.Title = "Created";
+        }
+
+        return result;
+    }
+
+    public async Task<Result<TechnicianListDto>> RemoveTechnicianSpecialtyAsync(
+        int technicianId,
+        int specialtyId,
+        CancellationToken cancellationToken)
+    {
+        var technicianExists = await context.Technicians
+            .AnyAsync(item => item.Id == technicianId, cancellationToken);
+        if (!technicianExists)
+        {
+            return Result<TechnicianListDto>.Failure(404, "Not Found", $"No existe el técnico con id {technicianId}.");
+        }
+
+        var link = await context.TechnicianSpecialties
+            .FirstOrDefaultAsync(
+                item => item.TechnicianId == technicianId && item.SpecialtyId == specialtyId,
+                cancellationToken);
+        if (link is null)
+        {
+            return Result<TechnicianListDto>.Failure(
+                404, "Not Found", "El técnico no tiene asignada esta especialidad.");
+        }
+
+        context.TechnicianSpecialties.Remove(link);
+        await context.SaveChangesAsync(cancellationToken);
+
         return await GetTechnicianAsync(technicianId, cancellationToken);
     }
 

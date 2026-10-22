@@ -28,3 +28,7 @@ Content-Type: application/json
   "certificationLevel": "Intermediate",
   "certifiedSince": "2024-01-15"
 }
+
+### Quitar especialidad asignada a un técnico
+DELETE {{Proyecto.WebAPI_HostAddress}}/api/technicians/1/specialties/1
+Accept: application/json

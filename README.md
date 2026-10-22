@@ -26,6 +26,7 @@ Los siguientes endpoints de consulta devuelven respuestas con el formato `Result
 | `GET /api/maintenance-types` | Tipos de mantenimiento y la especialidad requerida, si existe. |
 | `GET /api/specialties` | Especialidades registradas. |
 | `GET /api/technicians` y `GET /api/technicians/{id}` | Técnicos y sus certificaciones asociadas. |
+| `POST /api/technicians/{id}/specialties/{specialtyId}` y `DELETE /api/technicians/{id}/specialties/{specialtyId}` | Asignar certificación a un técnico y quitarla. |
 
 Las solicitudes de ejemplo están en `Proyecto.WebAPI/Proyecto.WebAPI.http`.
 
