@@ -4,4 +4,5 @@
   <Project Path="Proyecto.Infraestructure/Proyecto.Infraestructure.csproj" />
   <Project Path="Proyecto.Shared/Proyecto.Shared.csproj" />
   <Project Path="Proyecto.WebAPI/Proyecto.WebAPI.csproj" />
+  <Project Path="Proyecto.WebAPI.Tests/Proyecto.WebAPI.Tests.csproj" />
 </Solution>
