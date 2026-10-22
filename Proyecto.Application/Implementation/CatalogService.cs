@@ -46,4 +46,55 @@ public sealed class CatalogService(AppDbContext context) : ICatalogService
 
         return Result<IEnumerable<MaintenanceTypeListDto>>.Success(maintenanceTypes);
     }
+
+    public async Task<Result<IEnumerable<SpecialtyListDto>>> GetSpecialtiesAsync(
+        CancellationToken cancellationToken)
+    {
+        var specialties = await context.Specialties
+            .AsNoTracking()
+            .OrderBy(specialty => specialty.Name)
+            .Select(specialty => new SpecialtyListDto
+            {
+                Id = specialty.Id,
+                Name = specialty.Name,
+                Description = specialty.Description
+            })
+            .ToListAsync(cancellationToken);
+
+        return Result<IEnumerable<SpecialtyListDto>>.Success(specialties);
+    }
+
+    public async Task<Result<IEnumerable<TechnicianListDto>>> GetTechniciansAsync(
+        CancellationToken cancellationToken)
+    {
+        var technicians = await context.Technicians
+            .AsNoTracking()
+            .Include(technician => technician.TechnicianSpecialties)
+                .ThenInclude(link => link.Specialty)
+            .OrderBy(technician => technician.FullName)
+            .ToListAsync(cancellationToken);
+
+        var data = technicians.Select(technician => new TechnicianListDto
+        {
+            Id = technician.Id,
+            FullName = technician.FullName,
+            IdentificationNumber = technician.IdentificationNumber,
+            Email = technician.Email,
+            Phone = technician.Phone,
+            IsAvailable = technician.IsAvailable,
+            HourlyRate = technician.HourlyRate,
+            Specialties = technician.TechnicianSpecialties
+                .OrderBy(link => link.Specialty.Name)
+                .Select(link => new TechnicianSpecialtyListDto
+                {
+                    Id = link.SpecialtyId,
+                    Name = link.Specialty.Name,
+                    CertificationLevel = link.CertificationLevel,
+                    CertifiedSince = DateOnly.FromDateTime(link.CertifiedSince)
+                })
+                .ToArray()
+        }).ToArray();
+
+        return Result<IEnumerable<TechnicianListDto>>.Success(data);
+    }
 }
