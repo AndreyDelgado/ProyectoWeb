@@ -51,6 +51,10 @@ builder.Services.AddScoped<IAssetService, AssetService>();
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
 
+// MaintenanceOrder
+builder.Services.AddScoped<IMaintenanceOrderRepository, MaintenanceOrderRepository>();
+builder.Services.AddScoped<IMaintenanceOrderService, MaintenanceOrderService>();
+
 // Mapster: Pattern Mapper
 // 1. Registrar las configuraciones personalizadas
 MapsterConfig.RegisterMaps();

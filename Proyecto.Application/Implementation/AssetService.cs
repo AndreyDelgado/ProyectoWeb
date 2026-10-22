@@ -14,6 +14,7 @@ public class AssetService : IAssetService
     public const int MaxPageSize = 50;
 
     public const string StatusDecommissioned = "Decommissioned";
+    public const string StatusUnderMaintenance = "UnderMaintenance";
 
     // Estados en los que una orden se considera cerrada; cualquier otro estado impide la baja del activo
     public static readonly string[] ClosedOrderStatuses = ["Completed", "Rejected", "Cancelled"];

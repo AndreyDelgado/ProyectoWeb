@@ -80,5 +80,39 @@ public static class MapsterConfig
             .Ignore(dest => dest.Id,                // Se toma del parámetro de la ruta
                     dest => dest.Assets,
                     dest => dest.MaintenanceOrders);
+
+        // MaintenanceOrder
+        // Los datos del activo, el tipo y el proveedor requieren Include en el repositorio.
+        TypeAdapterConfig<MaintenanceOrder, MaintenanceOrderListDto>
+            .NewConfig()
+            .Map(dest => dest.AssetCode, src => src.Asset.AssetCode)
+            .Map(dest => dest.AssetName, src => src.Asset.Name)
+            .Map(dest => dest.MaintenanceTypeName, src => src.MaintenanceType.Name)
+            .Map(dest => dest.SupplierName, src => src.Supplier == null ? null : src.Supplier.Name);
+
+        TypeAdapterConfig<MaintenanceOrder, MaintenanceOrderDetailDto>
+            .NewConfig()
+            .Map(dest => dest.AssetCode, src => src.Asset.AssetCode)
+            .Map(dest => dest.AssetName, src => src.Asset.Name)
+            .Map(dest => dest.MaintenanceTypeName, src => src.MaintenanceType.Name)
+            .Map(dest => dest.IsEmergency, src => src.MaintenanceType.IsEmergency)
+            .Map(dest => dest.SupplierName, src => src.Supplier == null ? null : src.Supplier.Name);
+
+        // En el DTO de entrada se ignoran los campos que asigna el servidor o que se definen en etapas posteriores
+        TypeAdapterConfig<MaintenanceOrderCreateDto, MaintenanceOrder>
+            .NewConfig()
+            .Ignore(dest => dest.Id,
+                    dest => dest.WorkOrderCode,
+                    dest => dest.Status,
+                    dest => dest.RequestedAt,
+                    dest => dest.ScheduledFor!,
+                    dest => dest.StartedAt!,
+                    dest => dest.ClosedAt!,
+                    dest => dest.TotalCost!,
+                    dest => dest.Findings!,
+                    dest => dest.CreatedAt,
+                    dest => dest.Asset,
+                    dest => dest.MaintenanceType,
+                    dest => dest.Supplier!);
     }
 }
