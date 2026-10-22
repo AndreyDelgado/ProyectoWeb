@@ -1,6 +1,17 @@
 @Proyecto.WebAPI_HostAddress = http://localhost:5022
 
-GET {{Proyecto.WebAPI_HostAddress}}/weatherforecast/
+### Ubicaciones activas para formularios de activos
+GET {{Proyecto.WebAPI_HostAddress}}/api/locations
 Accept: application/json
 
-###
+### Tipos de mantenimiento con especialidad requerida
+GET {{Proyecto.WebAPI_HostAddress}}/api/maintenance-types
+Accept: application/json
+
+### Especialidades disponibles
+GET {{Proyecto.WebAPI_HostAddress}}/api/specialties
+Accept: application/json
+
+### Técnicos y sus certificaciones
+GET {{Proyecto.WebAPI_HostAddress}}/api/technicians
+Accept: application/json

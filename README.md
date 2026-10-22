@@ -16,6 +16,19 @@ Para crearla manualmente, ejecuta `database/MantenimientoActivos.sql` en SQL Ser
 
 El modelo inicial incluye categorías, ubicaciones, proveedores, activos, tipos de mantenimiento y órdenes de mantenimiento. La cadena de conexión de desarrollo está en `Proyecto.WebAPI/appsettings.Development.json` y se puede reemplazar por la instancia SQL Server del equipo.
 
+## Catálogos de la API
+
+Los siguientes endpoints de consulta devuelven respuestas con el formato `Result<T>`:
+
+| Endpoint | Contenido |
+| --- | --- |
+| `GET /api/locations` | Ubicaciones activas, ordenadas por nombre. |
+| `GET /api/maintenance-types` | Tipos de mantenimiento y la especialidad requerida, si existe. |
+| `GET /api/specialties` | Especialidades registradas. |
+| `GET /api/technicians` | Técnicos y sus certificaciones asociadas. |
+
+Las solicitudes de ejemplo están en `Proyecto.WebAPI/Proyecto.WebAPI.http`.
+
 
 
 ## Getting started
