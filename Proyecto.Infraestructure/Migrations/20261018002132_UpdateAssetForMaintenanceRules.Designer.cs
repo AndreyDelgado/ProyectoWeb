@@ -11,7 +11,7 @@ using Proyecto.Infraestructure.Data;
 
 namespace Proyecto.Infraestructure.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(ContextoAplicacion))]
     [Migration("20261018002132_UpdateAssetForMaintenanceRules")]
     partial class UpdateAssetForMaintenanceRules
     {

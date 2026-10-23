@@ -5,13 +5,13 @@ using Xunit;
 
 namespace Proyecto.WebAPI.Tests;
 
-public sealed class TechnicianEndpointsTests
+public sealed class PruebasEndpointsTecnico
 {
     [Fact]
-    public async Task CatalogAndTechnicianEndpoints_ReturnSeededData()
+    public async Task EndpointsCatalogosYTecnicos_DevuelvenDatosIniciales()
     {
-        using var factory = new ApiFactory();
-        await factory.SeedAsync();
+        using var factory = new FabricaApi();
+        await factory.SembrarAsync();
         using var client = factory.CreateClient();
 
         foreach (var path in new[]
@@ -22,36 +22,36 @@ public sealed class TechnicianEndpointsTests
                      "/api/technicians"
                  })
         {
-            using var response = await client.GetAsync(path);
+            using var respuesta = await client.GetAsync(path);
 
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            using var body = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
+            Assert.Equal(HttpStatusCode.OK, respuesta.StatusCode);
+            using var body = await JsonDocument.ParseAsync(await respuesta.Content.ReadAsStreamAsync());
             Assert.True(body.RootElement.GetProperty("data").GetArrayLength() > 0, path);
         }
 
-        using var technicianResponse = await client.GetAsync($"/api/technicians/{ApiFactory.TechnicianId}");
+        using var technicianResponse = await client.GetAsync($"/api/technicians/{FabricaApi.TecnicoId}");
         Assert.Equal(HttpStatusCode.OK, technicianResponse.StatusCode);
     }
 
     [Fact]
-    public async Task TechnicianSpecialtyEndpoints_AssignReadAndRemoveSpecialty()
+    public async Task EndpointsEspecialidadTecnico_AsignarConsultarYQuitarEspecialidad()
     {
-        using var factory = new ApiFactory();
-        await factory.SeedAsync();
+        using var factory = new FabricaApi();
+        await factory.SembrarAsync();
         using var client = factory.CreateClient();
-        var request = new
+        var solicitud = new
         {
             certificationLevel = "Advanced",
             certifiedSince = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(-1))
         };
         var assignmentPath =
-            $"/api/technicians/{ApiFactory.TechnicianId}/specialties/{ApiFactory.SpecialtyId}";
+            $"/api/technicians/{FabricaApi.TecnicoId}/specialties/{FabricaApi.EspecialidadId}";
 
-        using var assignmentResponse = await client.PostAsJsonAsync(assignmentPath, request);
+        using var assignmentResponse = await client.PostAsJsonAsync(assignmentPath, solicitud);
         Assert.Equal(HttpStatusCode.Created, assignmentResponse.StatusCode);
 
         using var technicianResponse =
-            await client.GetAsync($"/api/technicians/{ApiFactory.TechnicianId}");
+            await client.GetAsync($"/api/technicians/{FabricaApi.TecnicoId}");
         Assert.Equal(HttpStatusCode.OK, technicianResponse.StatusCode);
         using (var technicianBody =
                await JsonDocument.ParseAsync(await technicianResponse.Content.ReadAsStreamAsync()))
@@ -61,14 +61,14 @@ public sealed class TechnicianEndpointsTests
                 .GetProperty("specialties");
             Assert.Contains(
                 specialties.EnumerateArray(),
-                specialty => specialty.GetProperty("id").GetInt32() == ApiFactory.SpecialtyId);
+                especialidad => especialidad.GetProperty("id").GetInt32() == FabricaApi.EspecialidadId);
         }
 
         using var removalResponse = await client.DeleteAsync(assignmentPath);
         Assert.Equal(HttpStatusCode.NoContent, removalResponse.StatusCode);
 
         using var technicianAfterRemoval =
-            await client.GetAsync($"/api/technicians/{ApiFactory.TechnicianId}");
+            await client.GetAsync($"/api/technicians/{FabricaApi.TecnicoId}");
         using var bodyAfterRemoval =
             await JsonDocument.ParseAsync(await technicianAfterRemoval.Content.ReadAsStreamAsync());
         Assert.Empty(bodyAfterRemoval.RootElement
@@ -78,13 +78,13 @@ public sealed class TechnicianEndpointsTests
     }
 
     [Fact]
-    public async Task TechnicianSpecialtyEndpoints_RejectInvalidDuplicateAndMissingAssignments()
+    public async Task EndpointsEspecialidadTecnico_RechazanAsignacionesInvalidasDuplicadasYAusentes()
     {
-        using var factory = new ApiFactory();
-        await factory.SeedAsync();
+        using var factory = new FabricaApi();
+        await factory.SembrarAsync();
         using var client = factory.CreateClient();
         var assignmentPath =
-            $"/api/technicians/{ApiFactory.TechnicianId}/specialties/{ApiFactory.SpecialtyId}";
+            $"/api/technicians/{FabricaApi.TecnicoId}/specialties/{FabricaApi.EspecialidadId}";
 
         using var invalidLevelResponse = await client.PostAsJsonAsync(assignmentPath, new
         {
@@ -112,7 +112,7 @@ public sealed class TechnicianEndpointsTests
         Assert.Equal(HttpStatusCode.Conflict, duplicateAssignment.StatusCode);
 
         using var missingTechnician = await client.PostAsJsonAsync(
-            $"/api/technicians/{ApiFactory.TechnicianId + 1}/specialties/{ApiFactory.SpecialtyId}",
+            $"/api/technicians/{FabricaApi.TecnicoId + 1}/specialties/{FabricaApi.EspecialidadId}",
             validRequest);
         Assert.Equal(HttpStatusCode.NotFound, missingTechnician.StatusCode);
     }
