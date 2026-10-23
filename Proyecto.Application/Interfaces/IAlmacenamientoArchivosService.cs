@@ -1,9 +1,9 @@
 namespace Proyecto.Application.Interfaces;
 
 // Los servicios dependen de esta interfaz y no del disco, para poder cambiar el almacenamiento sin modificarlos
-public interface IFileStorageService
+public interface IAlmacenamientoArchivosService
 {
-    Task SaveAsync(Stream content, string fileName);
+    Task GuardarAsync(Stream content, string nombreArchivo);
 
-    void Delete(string fileName);
+    void Eliminar(string nombreArchivo);
 }
