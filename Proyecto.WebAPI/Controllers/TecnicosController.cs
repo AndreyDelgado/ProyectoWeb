@@ -6,7 +6,7 @@ using Proyecto.Domain.DTO.ResultadoPatron;
 
 namespace Proyecto.WebAPI.Controllers;
 
-/// <summary>Administración de los técnicos y de sus especialidades.</summary>
+/// <summary>Administración de los técnicos y de sus especialidades</summary>
 [Route("api/technicians")]
 [ApiController]
 [Produces("application/json")]
@@ -21,7 +21,7 @@ public class TecnicosController : ControllerBase
         _registro = registro;
     }
 
-    /// <summary>Obtiene la lista de técnicos.</summary>
+    /// <summary>Obtiene la lista de técnicos</summary>
     /// <remarks>Se puede filtrar por especialidad y por disponibilidad. Cada técnico incluye la cantidad de especialidades que tiene.</remarks>
     /// <param name="especialidadId">Id de la especialidad (opcional).</param>
     /// <param name="estaDisponible">true para disponibles, false para no disponibles (opcional).</param>
@@ -44,7 +44,7 @@ public class TecnicosController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Obtiene el detalle de un técnico.</summary>
+    /// <summary>Obtiene el detalle de un técnico</summary>
     /// <remarks>Incluye cada especialidad con su nivel de certificación, la fecha desde la que la tiene y la antigüedad en meses.</remarks>
     /// <param name="id">Id del técnico.</param>
     /// <response code="200">Detalle del técnico.</response>
@@ -64,7 +64,7 @@ public class TecnicosController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Registra un técnico nuevo.</summary>
+    /// <summary>Registra un técnico nuevo</summary>
     /// <remarks>La identificación no se puede repetir.</remarks>
     /// <response code="201">Técnico registrado.</response>
     /// <response code="400">Los datos enviados no son válidos. La respuesta indica qué campo falló y por qué.</response>
@@ -85,7 +85,7 @@ public class TecnicosController : ControllerBase
         return CreatedAtRoute("GetTechnicianById", new { id = resultado.Datos.Identificador }, resultado);
     }
 
-    /// <summary>Actualiza un técnico.</summary>
+    /// <summary>Actualiza un técnico</summary>
     /// <param name="id">Id del técnico.</param>
     /// <response code="200">Técnico actualizado.</response>
     /// <response code="400">Los datos enviados no son válidos. La respuesta indica qué campo falló y por qué.</response>
@@ -108,7 +108,7 @@ public class TecnicosController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Asocia una especialidad a un técnico.</summary>
+    /// <summary>Asocia una especialidad a un técnico</summary>
     /// <remarks>Se indica el nivel de certificación (Basic, Intermediate o Advanced) y la fecha desde la que la tiene, que no puede ser futura.</remarks>
     /// <param name="id">Id del técnico.</param>
     /// <param name="especialidadId">Id de la especialidad.</param>
@@ -134,7 +134,7 @@ public class TecnicosController : ControllerBase
         return CreatedAtRoute("GetTechnicianById", new { id }, resultado);
     }
 
-    /// <summary>Quita una especialidad de un técnico.</summary>
+    /// <summary>Quita una especialidad de un técnico</summary>
     /// <param name="id">Id del técnico.</param>
     /// <param name="especialidadId">Id de la especialidad.</param>
     /// <response code="200">Especialidad quitada; devuelve el técnico actualizado.</response>

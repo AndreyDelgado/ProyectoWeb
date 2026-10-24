@@ -6,7 +6,7 @@ using Proyecto.Domain.DTO.ResultadoPatron;
 
 namespace Proyecto.WebAPI.Controllers;
 
-/// <summary>Administración de los activos de TI: registro, consulta, actualización, cambio de estado, baja e imagen.</summary>
+/// <summary>Administración de los activos de TI: registro, consulta, actualización, cambio de estado, baja e imagen</summary>
 [Route("api/assets")]
 [ApiController]
 [Produces("application/json")]
@@ -21,7 +21,7 @@ public class ActivoController : ControllerBase
         _registro = registro;
     }
 
-    /// <summary>Obtiene la lista de activos.</summary>
+    /// <summary>Obtiene la lista de activos</summary>
     /// <remarks>Se puede filtrar por categoría y por estado. Si no se indica un estado, no se incluyen los activos dados de baja. Cada activo incluye el nombre de su categoría, su antigüedad en meses y la cantidad de órdenes de mantenimiento.</remarks>
     /// <param name="categoriaId">Id de la categoría (opcional).</param>
     /// <param name="estado">Estado del activo (opcional): Operational, UnderMaintenance, OutOfService o Decommissioned.</param>
@@ -43,7 +43,7 @@ public class ActivoController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Obtiene la lista de activos por páginas.</summary>
+    /// <summary>Obtiene la lista de activos por páginas</summary>
     /// <remarks>Acepta los mismos filtros que la lista completa.</remarks>
     /// <param name="paginaNumero">Número de página, empezando en 1.</param>
     /// <param name="tamanoPagina">Cantidad de registros por página (entre 1 y 50).</param>
@@ -68,7 +68,7 @@ public class ActivoController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Obtiene el detalle de un activo.</summary>
+    /// <summary>Obtiene el detalle de un activo</summary>
     /// <remarks>Incluye todos sus datos, la categoría con su umbral de mantenimiento preventivo, la antigüedad, las horas desde el último mantenimiento, si ya requiere mantenimiento preventivo y el resumen de sus órdenes.</remarks>
     /// <param name="id">Id del activo.</param>
     /// <response code="200">Detalle del activo.</response>
@@ -88,7 +88,7 @@ public class ActivoController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Registra un activo nuevo.</summary>
+    /// <summary>Registra un activo nuevo</summary>
     /// <remarks>El código del activo lo asigna el sistema con el prefijo de la categoría y un número consecutivo (por ejemplo, SRV-0003). El número de serie no se puede repetir.</remarks>
     /// <response code="201">Activo registrado.</response>
     /// <response code="400">Los datos enviados no son válidos. La respuesta indica qué campo falló y por qué.</response>
@@ -109,7 +109,7 @@ public class ActivoController : ControllerBase
         return CreatedAtRoute("GetAssetById", new { id = resultado.Datos.Identificador }, resultado);
     }
 
-    /// <summary>Actualiza los datos de un activo.</summary>
+    /// <summary>Actualiza los datos de un activo</summary>
     /// <remarks>No se puede actualizar un activo dado de baja.</remarks>
     /// <param name="id">Id del activo.</param>
     /// <response code="200">Activo actualizado.</response>
@@ -133,7 +133,7 @@ public class ActivoController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Cambia el estado de un activo.</summary>
+    /// <summary>Cambia el estado de un activo</summary>
     /// <remarks>Estados permitidos: Operational, OutOfService (fuera de servicio) y Decommissioned (dado de baja). No se puede cambiar el estado mientras el activo tenga una orden de mantenimiento abierta.</remarks>
     /// <param name="id">Id del activo.</param>
     /// <response code="200">Estado actualizado.</response>
@@ -157,7 +157,7 @@ public class ActivoController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Da de baja un activo.</summary>
+    /// <summary>Da de baja un activo</summary>
     /// <remarks>Es una baja lógica: el activo pasa al estado Decommissioned y se conserva su historial; no se borra de la base de datos. No se permite si tiene una orden de mantenimiento abierta.</remarks>
     /// <param name="id">Id del activo.</param>
     /// <response code="200">Activo dado de baja.</response>
@@ -179,7 +179,7 @@ public class ActivoController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Carga o reemplaza la imagen de un activo.</summary>
+    /// <summary>Carga o reemplaza la imagen de un activo</summary>
     /// <remarks>Se envía como multipart/form-data en el campo file. Formatos permitidos: jpg, jpeg, png y webp, de hasta 2 MB.</remarks>
     /// <param name="id">Id del activo.</param>
     /// <param name="archivo">Archivo de imagen.</param>
@@ -207,7 +207,7 @@ public class ActivoController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Elimina la imagen de un activo.</summary>
+    /// <summary>Elimina la imagen de un activo</summary>
     /// <remarks>Después de eliminarla, el activo muestra la imagen predeterminada.</remarks>
     /// <param name="id">Id del activo.</param>
     /// <response code="200">Imagen eliminada.</response>

@@ -5,7 +5,7 @@ using Proyecto.Domain.DTO.ResultadoPatron;
 
 namespace Proyecto.WebAPI.Controllers;
 
-/// <summary>Administración de los proveedores de servicios y de repuestos.</summary>
+/// <summary>Administración de los proveedores de servicios y de repuestos</summary>
 [Route("api/suppliers")]
 [ApiController]
 [Produces("application/json")]
@@ -20,7 +20,7 @@ public class ProveedorController : ControllerBase
         _registro = registro;
     }
 
-    /// <summary>Obtiene la lista de proveedores.</summary>
+    /// <summary>Obtiene la lista de proveedores</summary>
     /// <response code="200">Lista de proveedores.</response>
     /// <response code="500">Error inesperado del servidor. La respuesta incluye el traceId para buscarlo en el log.</response>
     [HttpGet]
@@ -36,7 +36,7 @@ public class ProveedorController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Obtiene la lista de proveedores por páginas.</summary>
+    /// <summary>Obtiene la lista de proveedores por páginas</summary>
     /// <param name="paginaNumero">Número de página, empezando en 1.</param>
     /// <param name="tamanoPagina">Cantidad de registros por página (entre 1 y 50).</param>
     /// <response code="200">Página de proveedores.</response>
@@ -56,7 +56,7 @@ public class ProveedorController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Obtiene el detalle de un proveedor.</summary>
+    /// <summary>Obtiene el detalle de un proveedor</summary>
     /// <remarks>Incluye los repuestos que suministra, con su precio ofrecido y tiempo de entrega.</remarks>
     /// <param name="id">Id del proveedor.</param>
     /// <response code="200">Detalle del proveedor.</response>
@@ -76,7 +76,7 @@ public class ProveedorController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Registra un proveedor nuevo.</summary>
+    /// <summary>Registra un proveedor nuevo</summary>
     /// <remarks>La cédula jurídica no se puede repetir.</remarks>
     /// <response code="201">Proveedor registrado.</response>
     /// <response code="400">Los datos enviados no son válidos. La respuesta indica qué campo falló y por qué.</response>
@@ -97,7 +97,7 @@ public class ProveedorController : ControllerBase
         return CreatedAtRoute("GetSupplierById", new { id = resultado.Datos.Identificador }, resultado);
     }
 
-    /// <summary>Actualiza un proveedor.</summary>
+    /// <summary>Actualiza un proveedor</summary>
     /// <param name="id">Id del proveedor.</param>
     /// <response code="200">Proveedor actualizado.</response>
     /// <response code="400">Los datos enviados no son válidos. La respuesta indica qué campo falló y por qué.</response>
@@ -120,7 +120,7 @@ public class ProveedorController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Elimina un proveedor.</summary>
+    /// <summary>Elimina un proveedor</summary>
     /// <remarks>Solo se puede eliminar si no tiene activos, órdenes ni repuestos asociados.</remarks>
     /// <param name="id">Id del proveedor.</param>
     /// <response code="200">Proveedor eliminado.</response>

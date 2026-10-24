@@ -5,7 +5,7 @@ using Proyecto.Domain.DTO.ResultadoPatron;
 
 namespace Proyecto.WebAPI.Controllers;
 
-/// <summary>Administración de las especialidades técnicas.</summary>
+/// <summary>Administración de las especialidades técnicas</summary>
 [Route("api/specialties")]
 [ApiController]
 [Produces("application/json")]
@@ -20,7 +20,7 @@ public class EspecialidadesController : ControllerBase
         _registro = registro;
     }
 
-    /// <summary>Obtiene la lista de especialidades.</summary>
+    /// <summary>Obtiene la lista de especialidades</summary>
     /// <remarks>Cada especialidad incluye la cantidad de técnicos que la tienen.</remarks>
     /// <response code="200">Lista de especialidades.</response>
     /// <response code="500">Error inesperado del servidor. La respuesta incluye el traceId para buscarlo en el log.</response>
@@ -37,7 +37,7 @@ public class EspecialidadesController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Obtiene el detalle de una especialidad.</summary>
+    /// <summary>Obtiene el detalle de una especialidad</summary>
     /// <remarks>Incluye los técnicos que la tienen, con su nivel de certificación y disponibilidad.</remarks>
     /// <param name="id">Id de la especialidad.</param>
     /// <response code="200">Detalle de la especialidad.</response>
@@ -57,7 +57,7 @@ public class EspecialidadesController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Registra una especialidad nueva.</summary>
+    /// <summary>Registra una especialidad nueva</summary>
     /// <remarks>El nombre no se puede repetir.</remarks>
     /// <response code="201">Especialidad registrada.</response>
     /// <response code="400">Los datos enviados no son válidos. La respuesta indica qué campo falló y por qué.</response>
@@ -78,7 +78,7 @@ public class EspecialidadesController : ControllerBase
         return CreatedAtRoute("GetSpecialtyById", new { id = resultado.Datos.Identificador }, resultado);
     }
 
-    /// <summary>Actualiza una especialidad.</summary>
+    /// <summary>Actualiza una especialidad</summary>
     /// <param name="id">Id de la especialidad.</param>
     /// <response code="200">Especialidad actualizada.</response>
     /// <response code="400">Los datos enviados no son válidos. La respuesta indica qué campo falló y por qué.</response>

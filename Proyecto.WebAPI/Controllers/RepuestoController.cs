@@ -5,7 +5,7 @@ using Proyecto.Domain.DTO.ResultadoPatron;
 
 namespace Proyecto.WebAPI.Controllers;
 
-/// <summary>Administración de los repuestos, su stock y los proveedores que los ofrecen.</summary>
+/// <summary>Administración de los repuestos, su stock y los proveedores que los ofrecen</summary>
 [Route("api/spare-parts")]
 [ApiController]
 [Produces("application/json")]
@@ -20,7 +20,7 @@ public class RepuestoController : ControllerBase
         _registro = registro;
     }
 
-    /// <summary>Obtiene la lista de repuestos.</summary>
+    /// <summary>Obtiene la lista de repuestos</summary>
     /// <remarks>Cada repuesto indica si está por debajo del stock mínimo, cuántas unidades faltan para llegar al mínimo y cuántos proveedores lo ofrecen.</remarks>
     /// <response code="200">Lista de repuestos.</response>
     /// <response code="500">Error inesperado del servidor. La respuesta incluye el traceId para buscarlo en el log.</response>
@@ -37,7 +37,7 @@ public class RepuestoController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Obtiene los repuestos con stock por debajo del mínimo.</summary>
+    /// <summary>Obtiene los repuestos con stock por debajo del mínimo</summary>
     /// <response code="200">Lista de repuestos con stock bajo.</response>
     /// <response code="500">Error inesperado del servidor. La respuesta incluye el traceId para buscarlo en el log.</response>
     [HttpGet("below-minimum")]
@@ -53,7 +53,7 @@ public class RepuestoController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Obtiene la lista de repuestos por páginas.</summary>
+    /// <summary>Obtiene la lista de repuestos por páginas</summary>
     /// <param name="paginaNumero">Número de página, empezando en 1.</param>
     /// <param name="tamanoPagina">Cantidad de registros por página (entre 1 y 50).</param>
     /// <response code="200">Página de repuestos.</response>
@@ -73,7 +73,7 @@ public class RepuestoController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Obtiene el detalle de un repuesto.</summary>
+    /// <summary>Obtiene el detalle de un repuesto</summary>
     /// <remarks>Incluye los proveedores que lo ofrecen, con su precio y tiempo de entrega.</remarks>
     /// <param name="id">Id del repuesto.</param>
     /// <response code="200">Detalle del repuesto.</response>
@@ -93,7 +93,7 @@ public class RepuestoController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Registra un repuesto nuevo.</summary>
+    /// <summary>Registra un repuesto nuevo</summary>
     /// <remarks>El código no se puede repetir y el stock no puede ser negativo.</remarks>
     /// <response code="201">Repuesto registrado.</response>
     /// <response code="400">Los datos enviados no son válidos. La respuesta indica qué campo falló y por qué.</response>
@@ -114,7 +114,7 @@ public class RepuestoController : ControllerBase
         return CreatedAtRoute("GetSparePartById", new { id = resultado.Datos.Identificador }, resultado);
     }
 
-    /// <summary>Actualiza un repuesto.</summary>
+    /// <summary>Actualiza un repuesto</summary>
     /// <param name="id">Id del repuesto.</param>
     /// <response code="200">Repuesto actualizado.</response>
     /// <response code="400">Los datos enviados no son válidos. La respuesta indica qué campo falló y por qué.</response>
@@ -137,7 +137,7 @@ public class RepuestoController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Asocia un proveedor a un repuesto.</summary>
+    /// <summary>Asocia un proveedor a un repuesto</summary>
     /// <remarks>Se indica el precio ofrecido y el tiempo de entrega estimado en días. El proveedor debe estar activo.</remarks>
     /// <param name="id">Id del repuesto.</param>
     /// <param name="proveedorId">Id del proveedor.</param>
@@ -163,7 +163,7 @@ public class RepuestoController : ControllerBase
         return CreatedAtRoute("GetSparePartById", new { id }, resultado);
     }
 
-    /// <summary>Actualiza el precio y el tiempo de entrega de un proveedor para un repuesto.</summary>
+    /// <summary>Actualiza el precio y el tiempo de entrega de un proveedor para un repuesto</summary>
     /// <param name="id">Id del repuesto.</param>
     /// <param name="proveedorId">Id del proveedor.</param>
     /// <response code="200">Condiciones actualizadas.</response>

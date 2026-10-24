@@ -3,6 +3,8 @@
 - Demo completa: `C:\Users\Andrey\Downloads\ProyectoWeb-main\ProyectoWeb-main`
 - Repo real: `C:\Users\Andrey\source\repos\Proyecto` (rama `feat/asset-maintenance-database`, último commit d842cf9)
 
+Estado de la demo de referencia: compila sin errores y pasan sus 17 pruebas (verificado en Visual Studio).
+
 Los prompts se ejecutan **hoy, uno detrás del otro y en este orden**: cada uno depende del anterior. Después de cada prompt: compilar, revisar el diff, probar en Scalar lo que se tocó y hacer el commit sugerido (sin línea de co-autoría). La columna "Quién" reparte los commits de forma pareja; si uno de los dos aplica todos, igual queda bien.
 
 Cada prompt le dice a Claude Code que **lea la demo como referencia**: así copia la misma solución en lugar de inventar otra. Si Austin no tiene la demo en su computadora, pásale el zip.
@@ -116,7 +118,9 @@ C:\Users\Andrey\Downloads\ProyectoWeb-main\ProyectoWeb-main (copia la misma solu
 4. Program.cs: AddExceptionHandler<ManejadorGlobalExcepciones>(), AddProblemDetails(), y
    app.UseExceptionHandler() como primer middleware. En InvalidModelStateResponseFactory asigna
    también IdentificadorTraza.
-5. Serilog: paquete Serilog.AspNetCore 10.0.0 en WebAPI; builder.Host.UseSerilog con
+5. Paquetes: en Proyecto.Infraestructure agrega System.Security.Cryptography.Pkcs 10.0.13 (la 9.0.11 que
+   llega por SqlClient tiene vulnerabilidades GHSA-846f-f764-76mx y GHSA-2fmv-rv2c-59x7, y el enunciado
+   no acepta paquetes vulnerables). Serilog: paquete Serilog.AspNetCore 10.0.0 en WebAPI; builder.Host.UseSerilog con
    ReadFrom.Configuration, Enrich.FromLogContext, WriteTo.Console y WriteTo.File("Logs/log-.txt",
    diario, 14 archivos), sin archivo cuando el entorno es "Testing". app.UseSerilogRequestLogging()
    después de UseExceptionHandler. En appsettings.json reemplaza "Logging" por "Serilog":
@@ -314,11 +318,13 @@ C:\Users\Andrey\Downloads\ProyectoWeb-main\ProyectoWeb-main\Proyecto.WebAPI\Cont
 2. En CADA controlador: inyecta ILogger<T> (campo _registro); en cada acción, LogInformation al iniciar
    (con los parámetros importantes como propiedades estructuradas {Id}, {Pagina}...) y al completar.
    Los Warning de las fallas los registra el ManejadorGlobalExcepciones: no atrapes excepciones en el controlador.
-3. En CADA acción: /// <summary> que diga qué hace en una línea, <remarks> cuando haya reglas
-   (409 por órdenes abiertas, etc.) y [ProducesResponseType(typeof(Resultado<TipoDto>), 200|201)] más
-   [ProducesResponseType(typeof(Resultado<object>), 400|404|409)] según lo que realmente pueda pasar.
-   [Produces("application/json")] en la clase. Los DELETE que responden 204 llevan
-   [ProducesResponseType(StatusCodes.Status204NoContent)].
+3. En CADA acción copia los comentarios /// de la demo tal cual (lenguaje neutro, sin nombres de
+   clases internas): <summary> de una línea, <remarks> con las reglas, <param> por parámetro y
+   <response code="..."> con lo que significa cada código en ese endpoint (incluido el 500).
+   Además [ProducesResponseType(typeof(Resultado<TipoDto>), 200|201)] y
+   [ProducesResponseType(typeof(Resultado<object>), 400|404|409)] según lo que realmente pueda pasar,
+   y [Produces("application/json")] en la clase. Ningún endpoint responde 204: todos devuelven Resultado.
+   Verifica que cada <param name> coincida con el nombre del parámetro en C# (paginaNumero, tamanoPagina...).
 4. Los POST de creación responden con CreatedAtRoute usando el Name del GET por id.
 
 Compila, abre /scalar y confirma que cada endpoint muestra el resumen, los códigos y los esquemas.

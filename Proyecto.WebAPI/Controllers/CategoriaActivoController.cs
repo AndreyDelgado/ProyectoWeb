@@ -5,7 +5,7 @@ using Proyecto.Domain.DTO.ResultadoPatron;
 
 namespace Proyecto.WebAPI.Controllers;
 
-/// <summary>Administración de las categorías de activos y de su umbral de mantenimiento preventivo.</summary>
+/// <summary>Administración de las categorías de activos y de su umbral de mantenimiento preventivo</summary>
 [Route("api/asset-categories")]
 [ApiController]
 [Produces("application/json")]
@@ -20,7 +20,7 @@ public class CategoriaActivoController : ControllerBase
         _registro = registro;
     }
 
-    /// <summary>Obtiene la lista de categorías.</summary>
+    /// <summary>Obtiene la lista de categorías</summary>
     /// <remarks>Cada categoría incluye la cantidad de activos asociados.</remarks>
     /// <response code="200">Lista de categorías.</response>
     /// <response code="500">Error inesperado del servidor. La respuesta incluye el traceId para buscarlo en el log.</response>
@@ -37,7 +37,7 @@ public class CategoriaActivoController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Obtiene la lista de categorías por páginas.</summary>
+    /// <summary>Obtiene la lista de categorías por páginas</summary>
     /// <param name="paginaNumero">Número de página, empezando en 1.</param>
     /// <param name="tamanoPagina">Cantidad de registros por página (entre 1 y 50).</param>
     /// <response code="200">Página de categorías.</response>
@@ -57,7 +57,7 @@ public class CategoriaActivoController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Obtiene el detalle de una categoría.</summary>
+    /// <summary>Obtiene el detalle de una categoría</summary>
     /// <remarks>Incluye su umbral de mantenimiento preventivo, la cantidad de activos y el listado de esos activos (código, nombre y estado).</remarks>
     /// <param name="id">Id de la categoría.</param>
     /// <response code="200">Detalle de la categoría.</response>
@@ -77,7 +77,7 @@ public class CategoriaActivoController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Registra una categoría nueva.</summary>
+    /// <summary>Registra una categoría nueva</summary>
     /// <remarks>El nombre y el prefijo de código no se pueden repetir.</remarks>
     /// <response code="201">Categoría registrada.</response>
     /// <response code="400">Los datos enviados no son válidos. La respuesta indica qué campo falló y por qué.</response>
@@ -98,7 +98,7 @@ public class CategoriaActivoController : ControllerBase
         return CreatedAtRoute("GetAssetCategoryById", new { id = resultado.Datos.Identificador }, resultado);
     }
 
-    /// <summary>Actualiza una categoría.</summary>
+    /// <summary>Actualiza una categoría</summary>
     /// <param name="id">Id de la categoría.</param>
     /// <response code="200">Categoría actualizada.</response>
     /// <response code="400">Los datos enviados no son válidos. La respuesta indica qué campo falló y por qué.</response>
@@ -121,7 +121,7 @@ public class CategoriaActivoController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Elimina una categoría.</summary>
+    /// <summary>Elimina una categoría</summary>
     /// <remarks>Solo se puede eliminar si no tiene activos asociados.</remarks>
     /// <param name="id">Id de la categoría.</param>
     /// <response code="200">Categoría eliminada.</response>

@@ -6,7 +6,7 @@ using Proyecto.Domain.DTO.ResultadoPatron;
 
 namespace Proyecto.WebAPI.Controllers;
 
-/// <summary>Solicitudes de mantenimiento: registro y consulta.</summary>
+/// <summary>Solicitudes de mantenimiento: registro y consulta</summary>
 [Route("api/maintenance-orders")]
 [ApiController]
 [Produces("application/json")]
@@ -21,7 +21,7 @@ public class OrdenMantenimientoController : ControllerBase
         _registro = registro;
     }
 
-    /// <summary>Obtiene la lista de órdenes de mantenimiento.</summary>
+    /// <summary>Obtiene la lista de órdenes de mantenimiento</summary>
     /// <remarks>Se puede filtrar por activo. Cada orden incluye el código y el nombre del activo y los días transcurridos desde la solicitud.</remarks>
     /// <param name="activoId">Id del activo (opcional).</param>
     /// <response code="200">Lista de órdenes.</response>
@@ -46,7 +46,7 @@ public class OrdenMantenimientoController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Obtiene la lista de órdenes por páginas.</summary>
+    /// <summary>Obtiene la lista de órdenes por páginas</summary>
     /// <param name="paginaNumero">Número de página, empezando en 1.</param>
     /// <param name="tamanoPagina">Cantidad de registros por página (entre 1 y 50).</param>
     /// <response code="200">Página de órdenes.</response>
@@ -66,7 +66,7 @@ public class OrdenMantenimientoController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Obtiene el detalle de una orden.</summary>
+    /// <summary>Obtiene el detalle de una orden</summary>
     /// <remarks>Incluye el activo relacionado (código, nombre, estado y categoría) y los días transcurridos desde la solicitud.</remarks>
     /// <param name="id">Id de la orden.</param>
     /// <response code="200">Detalle de la orden.</response>
@@ -86,7 +86,7 @@ public class OrdenMantenimientoController : ControllerBase
         return StatusCode(resultado.Estado, resultado);
     }
 
-    /// <summary>Registra una solicitud de mantenimiento.</summary>
+    /// <summary>Registra una solicitud de mantenimiento</summary>
     /// <remarks>La orden siempre se crea en estado Requested y el sistema asigna su código (por ejemplo, OT-2026-0011). No se permite para un activo dado de baja.</remarks>
     /// <response code="201">Solicitud registrada.</response>
     /// <response code="400">Los datos no son válidos, o el tipo de mantenimiento o el proveedor no existen.</response>
